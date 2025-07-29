@@ -87,7 +87,8 @@ const notifications = [
 const navigation = [
   { name: "الرئيسية", href: "/", icon: Home },
   { name: "المسوقين", href: "/marketers", icon: Users },
-  { name: "التقارير المفصلة", href: "/reports", icon: BarChart },
+  { name: "الروابط و الأكواد", href: "/LinksCodes", icon: BarChart },
+  // { name: "التقارير المفصلة", href: "/reports", icon: BarChart },
   { name: "الشركات", href: "/companies", icon: Building },
   { name: "طلبات المسوقين", href: "/requests", icon: UserPlus },
   { name: "طلبات السحب", href: "/withdrawals", icon: Banknote },
