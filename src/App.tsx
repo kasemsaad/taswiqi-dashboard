@@ -17,6 +17,8 @@ import AddCode from "./pages/AddCode";
 import EditCode from "./pages/EditCode";
 import EditCompanyPage from "./pages/EditCompanyPage";
 import RequestsPage from "./pages/RequestsPage";
+import UploadExcelReferral from "./pages/UploadExcelReferral";
+import UploadExcelCode from "./pages/UploadExcelCode";
 import WithdrawalsPage from "./pages/WithdrawalsPage";
 import CommunityPage from "./pages/CommunityPage";
 import AchievementsPage from "./pages/AchievementsPage";
@@ -55,6 +57,8 @@ const App = () => (
             <Route path="LinksCodes/editReferral/:id" element={<EditReferral />} />
             <Route path="LinksCodes/addCode" element={<AddCode />} />
             <Route path="LinksCodes/editCode/:id" element={<EditCode />} />
+            <Route path="LinksCodes/UploadExcelReferral" element={<UploadExcelReferral />} />
+            <Route path="LinksCodes/UploadExcelCode" element={<UploadExcelCode />} />
             <Route path="requests" element={<RequestsPage />} />
             <Route path="withdrawals" element={<WithdrawalsPage />} />
             <Route path="community" element={<CommunityPage />} />

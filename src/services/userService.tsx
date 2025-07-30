@@ -114,6 +114,31 @@ export const GetReferralLinksById= async (id:string
   const response = await Api.get<UsersServices>(`referral-link/${id}`);
   return response.data;
 };
+export const ExportReferralTemplate = async (): Promise<Blob> => {
+  const response = await Api.get<Blob>('referral-link/export-template', {
+    responseType: "blob",
+  });
+  return response.data;
+};
+export const ImportReferralLinks = async (
+  sendData: object
+): Promise<UsersServices> => {
+  const response = await Api.post<UsersServices>(`referral-link/import-data`, sendData);
+  return response.data;
+};
+
+export const ExportCodeTemplate = async (): Promise<Blob> => {
+  const response = await Api.get<Blob>('discount-code/export-template', {
+    responseType: "blob",
+  });
+  return response.data;
+};
+export const ImportCode = async (
+  sendData: object
+): Promise<UsersServices> => {
+  const response = await Api.post<UsersServices>(`discount-code/import-data`, sendData);
+  return response.data;
+};
 export const CreareCode = async (
   sendData: object
 ): Promise<UsersServices> => {

@@ -148,7 +148,7 @@ const EditReferralPage = () => {
               <div className="space-y-2">
                 <Label htmlFor="brand_id" >الشركة *</Label>
                 <Select
-                disabled
+                
                   value={formik.values.brand_id}
                   onValueChange={(value) => {
                     formik.setFieldValue("brand_id", value);

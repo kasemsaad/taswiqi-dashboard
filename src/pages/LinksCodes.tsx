@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building } from "lucide-react";
-
 import { Input } from "@/components/ui/input";
 import { GeneralTable } from "@/components/ui/tableCustom";
 import { TableColumn } from "@/components/ui/tableCustom";
@@ -14,7 +13,6 @@ import {
   GetNumbersReferralLinks,
   GetNumbersCodes,
 } from "@/services/userService";
-// import { Users } from "@/components/interfaces/Interfaces";
 import {
   Select,
   SelectContent,
@@ -25,8 +23,8 @@ import {
 import { Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-// import company from "@/assets/icons/companies.svg";
 import Delete from "@/assets/icons/delete.svg";
+import Eye from "@/assets/icons/eye.svg";
 import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -35,13 +33,22 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+
 export default function MarketersPage() {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
-  const [totalItems, setTotalItems] = useState(0);
+  
+  // Separate pagination states for referral links
+  const [referralPage, setReferralPage] = useState(1);
+  const [referralPerPage, setReferralPerPage] = useState(10);
+  const [referralTotalItems, setReferralTotalItems] = useState(0);
+  
+  // Separate pagination states for discount codes
+  const [codesPage, setCodesPage] = useState(1);
+  const [codesPerPage, setCodesPerPage] = useState(10);
+  const [codesTotalItems, setCodesTotalItems] = useState(0);
+  
   const [Referral, setReferral] = useState<any>(null);
   const [Codes, setCodes] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<"links" | "codes">("links");
@@ -52,42 +59,51 @@ export default function MarketersPage() {
     not_used_referral_links_count: 0,
     inactive_referral_links_count: 0,
     used_referral_links_this_month_count: 0,
-  } as any);
+  });
+
   const [CodesNumbers, setCodesNumbers] = useState({
     discount_codes_count: 0,
     used_discount_codes_count: 0,
     not_used_discount_codes_count: 0,
     inactive_discount_codes_count: 0,
     used_discount_codes_this_month_count: 0,
-  } as any);
+  });
+
   const [loading, setLoading] = useState(false);
 
-  const fetchReferralNumbers = async () => {
+  // Fetch statistics for both tables
+  const fetchStats = async () => {
     try {
-      const response = await GetNumbersReferralLinks();
-      const ReferralData = response.data as any;
-      setReferralNumbers(ReferralData);
+      const [referralRes, codesRes] = await Promise.all([
+        GetNumbersReferralLinks(),
+        GetNumbersCodes()
+      ]);
+      setReferralNumbers(referralRes.data as {
+        referral_links_count: number;
+        used_referral_links_count: number;
+        not_used_referral_links_count: number;
+        inactive_referral_links_count: number;
+        used_referral_links_this_month_count: number;
+      });
+      setCodesNumbers(codesRes.data as {
+        discount_codes_count: number;
+        used_discount_codes_count: number;
+        not_used_discount_codes_count: number;
+        inactive_discount_codes_count: number;
+        used_discount_codes_this_month_count: number;
+      });
     } catch (error) {
-      console.error("Error fetching Referral data:", error);
-    }
-  };
-  const fetchCodesNumbers = async () => {
-    try {
-      const response = await GetNumbersCodes();
-      const CodesData = response.data as any;
-      setCodesNumbers(CodesData);
-    } catch (error) {
-      console.error("Error fetching country data:", error);
+      console.error("Error fetching statistics:", error);
     }
   };
 
+  // Delete a referral link
   const deleteReferral = async (id) => {
     try {
       await deleteReferralLink(id);
       fetchReferral();
-
       toast({
-        title: " تم الحذف ",
+        title: "تم الحذف",
         description: "تم حذف رابط الإحالة بنجاح",
         variant: "destructive",
       });
@@ -95,19 +111,18 @@ export default function MarketersPage() {
       toast({
         title: "خطأ في الحذف",
         description: "حدث خطأ أثناء حذف رابط الإحالة",
-
         variant: "destructive",
       });
-      console.error("Error fetching Categories:", error);
     }
   };
+
+  // Delete a discount code
   const deleteCode = async (id) => {
     try {
       await deleteDiscountCode(id);
       fetchCodes();
-
       toast({
-        title: " تم الحذف ",
+        title: "تم الحذف",
         description: "تم حذف كود الخصم بنجاح",
         variant: "destructive",
       });
@@ -115,103 +130,84 @@ export default function MarketersPage() {
       toast({
         title: "خطأ في الحذف",
         description: "حدث خطأ أثناء حذف كود الخصم",
-
         variant: "destructive",
       });
-      console.error("Error fetching Categories:", error);
     }
   };
-  //////////////////////////////////////////////
+
+  // Fetch referral links data
   const fetchReferral = async () => {
     try {
       setLoading(true);
       const response = await GetAllReferralLinkspage({
-        page,
-        per_page: perPage,
+        page: referralPage,
+        per_page: referralPerPage,
         searchTerm: searchTerm || undefined,
-        filter:
-          statusFilter !== "all"
-            ? {
-                status: statusFilter ?? null,
-                // category_id: categoryFilter ?? null,
-              }
-            : undefined,
+        filter: statusFilter !== "all" ? { status: statusFilter } : undefined,
       });
 
-      // تحديث الحالة بالبيانات المستلمة
-      const referralData = response.data;
-      const referralMeta = response.meta;
-
-      setReferral(referralData);
-      if (referralMeta) {
-        setPage(referralMeta.current_page);
-        setPerPage(referralMeta.per_page);
-        setTotalItems(referralMeta.total);
+      setReferral(response.data);
+      if (response.meta) {
+        setReferralTotalItems(response.meta.total);
       }
-
-      console.log("Referral Data:", referralData);
     } catch (error) {
       console.error("Error fetching referral data:", error);
     } finally {
       setLoading(false);
     }
   };
+
+  // Fetch discount codes data
   const fetchCodes = async () => {
     try {
       setLoading(true);
       const response = await GetAllCodespage({
-        page,
-        per_page: perPage,
+        page: codesPage,
+        per_page: codesPerPage,
         searchTerm: searchTerm || undefined,
-        filter:
-          statusFilter !== "all"
-            ? {
-                status: statusFilter ?? null,
-                // category_id: categoryFilter ?? null,
-              }
-            : undefined,
+        filter: statusFilter !== "all" ? { status: statusFilter } : undefined,
       });
 
-      // تحديث الحالة بالبيانات المستلمة
-      const CodesData = response.data;
-      const CodesMeta = response.meta;
-
-      setCodes(CodesData);
-      if (CodesMeta) {
-        setPage(CodesMeta.current_page);
-        setPerPage(CodesMeta.per_page);
-        setTotalItems(CodesMeta.total);
+      setCodes(response.data);
+      if (response.meta) {
+        setCodesTotalItems(response.meta.total);
       }
-
-      console.log("Referral Data:", CodesData);
     } catch (error) {
-      console.error("Error fetching Codes data:", error);
+      console.error("Error fetching codes data:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchReferralNumbers();
-    fetchCodesNumbers();
-    fetchReferral();
-    fetchCodes();
-  }, [page, perPage, searchTerm, statusFilter]);
-
+  // Handle search
   const handleSearch = (term: string) => {
     setSearchTerm(term);
-    setPage(1);
+    setReferralPage(1);
+    setCodesPage(1);
   };
 
+  // Initial data fetch
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  // Fetch data when pagination or filters change
+  useEffect(() => {
+    if (activeTab === "links") {
+      fetchReferral();
+    } else {
+      fetchCodes();
+    }
+  }, [referralPage, referralPerPage, codesPage, codesPerPage, searchTerm, statusFilter, activeTab]);
+
+  // Columns for referral links table
   const ReferralColumns: TableColumn[] = [
     {
       key: "link",
       header: "الرابط",
       render: (marketer) => (
-        <div>
-          <div className="space-y-1">
-            <div className="text-sm">{marketer.link}</div>
-          </div>
+        <div className="space-y-1">
+          <div className="text-sm">{marketer.link}</div>
         </div>
       ),
     },
@@ -226,7 +222,7 @@ export default function MarketersPage() {
     },
     {
       key: "for_user",
-      header: " مخصّص ل",
+      header: "مخصّص ل",
       render: (marketer) => (
         <div className="space-y-1">
           <div className="text-sm">{marketer.for_user}</div>
@@ -260,7 +256,6 @@ export default function MarketersPage() {
         </div>
       ),
     },
-
     {
       key: "status",
       header: "الحالة",
@@ -286,28 +281,32 @@ export default function MarketersPage() {
       key: "id",
       header: "اجراءات",
       render: (marketer) => (
-        <div className="font-medium ps-5">
+        <div className="font-medium ps-5 gap-2 flex">
           <button
-            onClick={() => {
-              deleteReferral(marketer.id);
-            }}
+            onClick={() => navigate(`editReferral/${marketer.id}`)}
             className="text-muted-foreground hover:text-destructive"
           >
-            <img src={Delete} alt="company" />
+            <img src={Eye} alt="view" />
+          </button>
+          <button
+            onClick={() => deleteReferral(marketer.id)}
+            className="text-muted-foreground hover:text-destructive"
+          >
+            <img src={Delete} alt="delete" />
           </button>
         </div>
       ),
     },
   ];
+
+  // Columns for discount codes table
   const CodeColumns: TableColumn[] = [
     {
       key: "code",
       header: "الكود",
       render: (marketer) => (
-        <div>
-          <div className="space-y-1">
-            <div className="text-sm">{marketer.code}</div>
-          </div>
+        <div className="space-y-1">
+          <div className="text-sm">{marketer.code}</div>
         </div>
       ),
     },
@@ -322,7 +321,7 @@ export default function MarketersPage() {
     },
     {
       key: "for_user",
-      header: " مخصّص ل",
+      header: "مخصّص ل",
       render: (marketer) => (
         <div className="space-y-1">
           <div className="text-sm">{marketer.for_user}</div>
@@ -356,7 +355,6 @@ export default function MarketersPage() {
         </div>
       ),
     },
-
     {
       key: "status",
       header: "الحالة",
@@ -382,14 +380,18 @@ export default function MarketersPage() {
       key: "id",
       header: "اجراءات",
       render: (marketer) => (
-        <div className="font-medium ps-5">
+        <div className="font-medium ps-5 flex gap-2">
           <button
-            onClick={() => {
-              deleteCode(marketer.id);
-            }}
+            onClick={() => navigate(`editCode/${marketer.id}`)}
             className="text-muted-foreground hover:text-destructive"
           >
-            <img src={Delete} alt="company" />
+            <img src={Eye} alt="view" />
+          </button>
+          <button
+            onClick={() => deleteCode(marketer.id)}
+            className="text-muted-foreground hover:text-destructive"
+          >
+            <img src={Delete} alt="delete" />
           </button>
         </div>
       ),
@@ -401,100 +403,80 @@ export default function MarketersPage() {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">
-            {" "}
-            الروابط و الأكواد
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            قائمة بجميع الروابط و الأكواد
-          </p>
+          <h1 className="text-3xl font-bold text-foreground">الروابط و الأكواد</h1>
+          <p className="text-muted-foreground mt-1">قائمة بجميع الروابط و الأكواد</p>
         </div>
       
-       {activeTab === "links" && (
-  <DropdownMenu>
-    <DropdownMenuTrigger asChild>
-      <Button>
-        <Building className="h-4 w-4 ml-2" />
-        إضافة رابط جديد
-      </Button>
-    </DropdownMenuTrigger>
-    <DropdownMenuContent align="start">
-      <DropdownMenuItem asChild>
-        <Link to="/LinksCodes/addReferral">يدوي</Link>
-      </DropdownMenuItem>
-      <DropdownMenuItem asChild>
-        <Link to="/LinksCodes/add">رفع ملف</Link>
-      </DropdownMenuItem>
-    </DropdownMenuContent>
-  </DropdownMenu>
-)}
-       {activeTab === "codes" && (
-  <DropdownMenu>
-    <DropdownMenuTrigger asChild>
-      <Button>
-        <Building className="h-4 w-4 ml-2" />
-        إضافة كود جديد
-      </Button>
-    </DropdownMenuTrigger>
-    <DropdownMenuContent align="start">
-      <DropdownMenuItem asChild>
-        <Link to="/LinksCodes/addCode">يدوي</Link>
-      </DropdownMenuItem>
-      <DropdownMenuItem asChild>
-        <Link to="/LinksCodes/add">رفع ملف</Link>
-      </DropdownMenuItem>
-    </DropdownMenuContent>
-  </DropdownMenu>
-)}
-</div>
+        {activeTab === "links" ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button>
+                <Building className="h-4 w-4 ml-2" />
+                إضافة رابط جديد
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuItem asChild>
+                <Link to="/LinksCodes/addReferral">يدوي</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/LinksCodes/UploadExcelReferral">رفع ملف</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button>
+                <Building className="h-4 w-4 ml-2" />
+                إضافة كود جديد
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuItem asChild>
+                <Link to="/LinksCodes/addCode">يدوي</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/LinksCodes/UploadExcelCode">رفع ملف</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </div>
+
       {/* Stats Summary */}
-      {activeTab == "links" && (
+      {activeTab === "links" ? (
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <Card className="dashboard-card">
-            <CardContent className="pt-6" >
+            <CardContent className="pt-6">
               <div className="text-2xl font-bold">
                 {ReferralNumbers?.referral_links_count}
               </div>
-              <p className="text-muted-foreground text-sm">
-                إجمالي عدد الروابط{" "}
-              </p>
+              <p className="text-muted-foreground text-sm">إجمالي عدد الروابط</p>
             </CardContent>
           </Card>
           <Card className="dashboard-card">
-            <CardContent
-              className="pt-6"
-              
-            >
+            <CardContent className="pt-6">
               <div className="text-2xl font-bold text-success">
                 {ReferralNumbers?.used_referral_links_count}
               </div>
-              <p className="text-muted-foreground text-sm">
-                عدد الروابط المخصّصة
-              </p>
+              <p className="text-muted-foreground text-sm">عدد الروابط المخصّصة</p>
             </CardContent>
           </Card>
-          <Card
-            className="dashboard-card"
-          >
+          <Card className="dashboard-card">
             <CardContent className="pt-6">
               <div className="text-2xl font-bold text-destructive">
                 {ReferralNumbers?.not_used_referral_links_count}
               </div>
-              <p className="text-muted-foreground text-sm">
-                عدد الروابط الغير مخصّصة
-              </p>
+              <p className="text-muted-foreground text-sm">عدد الروابط الغير مخصّصة</p>
             </CardContent>
           </Card>
-          <Card
-            className="dashboard-card"
-          >
+          <Card className="dashboard-card">
             <CardContent className="pt-6">
               <div className="text-2xl font-bold text-destructive">
                 {ReferralNumbers?.inactive_referral_links_count}
               </div>
-              <p className="text-muted-foreground text-sm">
-                عدد الروابط المنتهية{" "}
-              </p>
+              <p className="text-muted-foreground text-sm">عدد الروابط المنتهية</p>
             </CardContent>
           </Card>
           <Card className="dashboard-card">
@@ -502,60 +484,42 @@ export default function MarketersPage() {
               <div className="text-2xl font-bold text-warning">
                 {ReferralNumbers?.used_referral_links_this_month_count}
               </div>
-              <p className="text-muted-foreground text-sm">
-                {" "}
-                الروابط المخصّصة هذا الشهر{" "}
-              </p>
+              <p className="text-muted-foreground text-sm">الروابط المخصّصة هذا الشهر</p>
             </CardContent>
           </Card>
         </div>
-      )}
-      {activeTab == "codes" && (
+      ) : (
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <Card className="dashboard-card">
-            <CardContent className="pt-6" >
+            <CardContent className="pt-6">
               <div className="text-2xl font-bold">
                 {CodesNumbers?.discount_codes_count}
               </div>
-              <p className="text-muted-foreground text-sm">
-                إجمالي عدد الروابط{" "}
-              </p>
+              <p className="text-muted-foreground text-sm">إجمالي عدد الأكواد</p>
             </CardContent>
           </Card>
           <Card className="dashboard-card">
-            <CardContent
-              className="pt-6"
-            >
+            <CardContent className="pt-6">
               <div className="text-2xl font-bold text-success">
                 {CodesNumbers?.used_discount_codes_count}
               </div>
-              <p className="text-muted-foreground text-sm">
-                عدد الروابط المخصّصة
-              </p>
+              <p className="text-muted-foreground text-sm">عدد الأكواد المخصّصة</p>
             </CardContent>
           </Card>
-          <Card
-            className="dashboard-card"
-          >
+          <Card className="dashboard-card">
             <CardContent className="pt-6">
               <div className="text-2xl font-bold text-destructive">
                 {CodesNumbers?.not_used_discount_codes_count}
               </div>
-              <p className="text-muted-foreground text-sm">
-                عدد الروابط الغير مخصّصة
-              </p>
+              <p className="text-muted-foreground text-sm">عدد الأكواد الغير مخصّصة</p>
             </CardContent>
           </Card>
-          <Card
-            className="dashboard-card"
-          >
+          <Card className="dashboard-card">
             <CardContent className="pt-6">
               <div className="text-2xl font-bold text-destructive">
                 {CodesNumbers?.inactive_discount_codes_count}
               </div>
-              <p className="text-muted-foreground text-sm">
-                عدد الروابط المنتهية{" "}
-              </p>
+              <p className="text-muted-foreground text-sm">عدد الأكواد المنتهية</p>
             </CardContent>
           </Card>
           <Card className="dashboard-card">
@@ -563,15 +527,13 @@ export default function MarketersPage() {
               <div className="text-2xl font-bold text-warning">
                 {CodesNumbers?.used_discount_codes_this_month_count}
               </div>
-              <p className="text-muted-foreground text-sm">
-                {" "}
-                الروابط المخصّصة هذا الشهر{" "}
-              </p>
+              <p className="text-muted-foreground text-sm">الأكواد المخصّصة هذا الشهر</p>
             </CardContent>
           </Card>
         </div>
       )}
 
+      {/* Search and Filter */}
       <Card className="dashboard-card">
         <CardHeader>
           <CardTitle>البحث والتصفية</CardTitle>
@@ -593,7 +555,8 @@ export default function MarketersPage() {
               value={statusFilter}
               onValueChange={(value) => {
                 setStatusFilter(value);
-                setPage(1);
+                setReferralPage(1);
+                setCodesPage(1);
               }}
             >
               <SelectTrigger className="w-48">
@@ -610,26 +573,24 @@ export default function MarketersPage() {
         </CardContent>
       </Card>
 
-      <Tabs defaultValue="links" className="space-y-4">
+      {/* Tabs for switching between tables */}
+      <Tabs value={activeTab} className="space-y-4">
         <TabsList className="grid w-full grid-cols-8" dir="rtl">
           <TabsTrigger
             value="links"
-            onClick={() => {
-              fetchReferral(), setActiveTab("links");
-            }}
+            onClick={() => setActiveTab("links")}
           >
-            {" "}
             روابط الإحالة
           </TabsTrigger>
           <TabsTrigger
             value="codes"
-            onClick={() => {
-              fetchCodes(), setActiveTab("codes");
-            }}
+            onClick={() => setActiveTab("codes")}
           >
             أكواد الخصم
           </TabsTrigger>
         </TabsList>
+        
+        {/* Referral Links Table */}
         <TabsContent value="links" className="space-y-4" dir="rtl">
           <Card className="dashboard-card">
             <CardHeader>
@@ -640,36 +601,37 @@ export default function MarketersPage() {
               columns={ReferralColumns}
               loading={loading}
               pagination={{
-                page,
-                perPage,
-                total: totalItems,
-                onPageChange: (newPage) => setPage(newPage),
+                page: referralPage,
+                perPage: referralPerPage,
+                total: referralTotalItems,
+                onPageChange: (newPage) => setReferralPage(newPage),
                 onPerPageChange: (newPerPage) => {
-                  setPerPage(newPerPage);
-                  setPage(1);
+                  setReferralPerPage(newPerPage);
+                  setReferralPage(1);
                 },
               }}
             />
           </Card>
         </TabsContent>
 
+        {/* Discount Codes Table */}
         <TabsContent value="codes" className="space-y-4" dir="rtl">
           <Card className="dashboard-card">
             <CardHeader>
-              <CardTitle> أكواد الخصم</CardTitle>
+              <CardTitle>أكواد الخصم</CardTitle>
             </CardHeader>
             <GeneralTable
               data={Codes}
               columns={CodeColumns}
               loading={loading}
               pagination={{
-                page,
-                perPage,
-                total: totalItems, // Use filtered length for total items
-                onPageChange: (newPage) => setPage(newPage),
+                page: codesPage,
+                perPage: codesPerPage,
+                total: codesTotalItems,
+                onPageChange: (newPage) => setCodesPage(newPage),
                 onPerPageChange: (newPerPage) => {
-                  setPerPage(newPerPage);
-                  setPage(1);
+                  setCodesPerPage(newPerPage);
+                  setCodesPage(1);
                 },
               }}
             />
