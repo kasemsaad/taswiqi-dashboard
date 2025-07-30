@@ -78,6 +78,27 @@ export const GetNumbersComanies = async (): Promise<UsersServices> => {
   const response = await Api.get<UsersServices>(`brands/get-numbers`);
   return response.data;
 };
+export const GetRequests = async (  params?: GetParams
+): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>(`referral-requests`, {
+    params,
+  });
+  return response.data;
+};
+export const CreateRequest = async (
+  sendData: object
+): Promise<UsersServices> => {
+  const response = await Api.post<UsersServices>(`referral-requests/assign-referral`, sendData);
+  return response.data;
+};
+export const GetNumbersRequstes = async (): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>(`referral-requests/get-numbers`);
+  return response.data;
+};
+export const GetReferralRequestById = async (id: string): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>(`referral-requests/${id}`);
+  return response.data;
+};
 export const GetBrandById = async (id: string): Promise<UsersServices> => {
   const response = await Api.get<UsersServices>(`brands/${id}`);
   return response.data;
@@ -180,7 +201,7 @@ export const GetNumbersCodes= async (): Promise<UsersServices> => {
 };
 export const GetAllCodespage = async (  params?: GetParams
 ): Promise<UsersServices> => {
-  const response = await Api.get<UsersServices>(`discount-code`, {
+  const response = await Api.get<UsersServices>(`referral-link`, {
     params,
   });
   return response.data;

@@ -356,7 +356,7 @@ export default function MarketersPage() {
 
       <Card className="dashboard-card">
         <CardHeader>
-          <CardTitle>قائمة الشركات ({totalItems})</CardTitle>
+          <CardTitle>قائمة الشركات</CardTitle>
         </CardHeader>
         <GeneralTable
           data={Brand}

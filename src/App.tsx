@@ -16,6 +16,7 @@ import EditReferral from "./pages/EditReferral";
 import AddCode from "./pages/AddCode";
 import EditCode from "./pages/EditCode";
 import EditCompanyPage from "./pages/EditCompanyPage";
+import AddReferralRequests from "./pages/AddRequestReferral";
 import RequestsPage from "./pages/RequestsPage";
 import UploadExcelReferral from "./pages/UploadExcelReferral";
 import UploadExcelCode from "./pages/UploadExcelCode";
@@ -54,12 +55,14 @@ const App = () => (
             <Route path="companies/add" element={<AddCompanyPage />} />
             <Route path="companies/edit/:id" element={<EditCompanyPage />} />
             <Route path="LinksCodes/addReferral" element={<AddReferral />} />
+            <Route path="LinksCodes/addReferral" element={<AddReferral />} />
             <Route path="LinksCodes/editReferral/:id" element={<EditReferral />} />
             <Route path="LinksCodes/addCode" element={<AddCode />} />
             <Route path="LinksCodes/editCode/:id" element={<EditCode />} />
             <Route path="LinksCodes/UploadExcelReferral" element={<UploadExcelReferral />} />
             <Route path="LinksCodes/UploadExcelCode" element={<UploadExcelCode />} />
             <Route path="requests" element={<RequestsPage />} />
+            <Route path="requests/addReferral/:id" element={<AddReferralRequests />} />
             <Route path="withdrawals" element={<WithdrawalsPage />} />
             <Route path="community" element={<CommunityPage />} />
             <Route path="achievements" element={<AchievementsPage />} />
