@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useFormik } from "formik";
-import * as Yup from "yup";
+// import { useFormik } from "formik";
+// import * as Yup from "yup";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 // import { Separator } from "@/components/ui/separator";
-import { ArrowRight, Save, Upload, Download } from "lucide-react";
+import { ArrowRight,  Upload, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { 
-  CreareReferralLink, 
+  // CreareReferralLink, 
   GetAllBrandsnoMeta,
   ExportCodeTemplate,
   ImportCode 
@@ -23,17 +23,17 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 
-const validationSchema = Yup.object().shape({
-  brand_id: Yup.string().required("الشركة مطلوبة"),
-  link: Yup.string()
-    .url("يجب أن يكون الكود صحيحًا")
-    .required("الكود مطلوب"),
-  earning_precentage: Yup.number()
-    .min(1, "يجب أن تكون النسبة بين 1 و 100")
-    .max(100, "يجب أن تكون النسبة بين 1 و 100")
-    .required("نسبة الربح مطلوبة"),
-  link_code: Yup.string().required("الكود  مطلوب"),
-});
+// const validationSchema = Yup.object().shape({
+//   brand_id: Yup.string().required("الشركة مطلوبة"),
+//   link: Yup.string()
+//     .url("يجب أن يكون الكود صحيحًا")
+//     .required("الكود مطلوب"),
+//   earning_precentage: Yup.number()
+//     .min(1, "يجب أن تكون النسبة بين 1 و 100")
+//     .max(100, "يجب أن تكون النسبة بين 1 و 100")
+//     .required("نسبة الربح مطلوبة"),
+//   link_code: Yup.string().required("الكود  مطلوب"),
+// });
 
 const AddCodePage = () => {
   const navigate = useNavigate();
