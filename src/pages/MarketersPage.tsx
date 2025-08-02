@@ -7,6 +7,8 @@ import { GeneralTable } from "@/components/ui/tableCustom";
 import { TableColumn } from "@/components/ui/tableCustom";
 import { GetCustomers, GetCustomersNumbers } from "@/services/userService";
 import { Users } from "@/components/interfaces/Interfaces";
+import Eye from "@/assets/icons/eye.svg";
+
 import {
   Select,
   SelectContent,
@@ -75,9 +77,6 @@ export default function MarketersPage() {
     setPage(1);
   };
 
-  const handleViewProfile = (marketer: any) => {
-    navigate(`/marketers/${marketer.id}`);
-  };
 
   const marketersColumns: TableColumn[] = [
     {
@@ -163,6 +162,21 @@ export default function MarketersPage() {
             ? "محظور"
             : "لايوجد حالة"}
         </Badge>
+      ),
+    },
+        {
+      key: "id",
+      header: "اجراءات",
+      render: (marketer) => (
+        <div className="font-medium ps-5 gap-2 flex">
+          <button
+            onClick={() => navigate(`/marketers/${marketer.id}`)}
+            className="text-muted-foreground hover:text-destructive"
+          >
+            <img src={Eye} alt="view" />
+          </button>
+         
+        </div>
       ),
     },
   ];
@@ -270,9 +284,9 @@ export default function MarketersPage() {
           data={Customers}
           columns={marketersColumns}
           loading={loading}
-          actions={{
-            view: handleViewProfile,
-          }}
+          // actions={{
+          //   view: handleViewProfile,
+          // }}
           pagination={{
             page,
             perPage,

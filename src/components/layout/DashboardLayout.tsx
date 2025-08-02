@@ -91,7 +91,7 @@ const navigation = [
   // { name: "التقارير المفصلة", href: "/reports", icon: BarChart },
   { name: "الشركات", href: "/companies", icon: Building },
   { name: "طلبات المسوقين", href: "/requests", icon: UserPlus },
-  { name: "طلبات السحب", href: "/withdrawals", icon: Banknote },
+  { name: "طلبات السحب", href: "/requsetWithdrawal", icon: Banknote },
   { name: "المجتمع", href: "/community", icon: MessageSquare },
   { name: "الشارات والإنجازات", href: "/achievements", icon: Award },
   { name: "التحقق من الهوية", href: "/verification", icon: Shield },

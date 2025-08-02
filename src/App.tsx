@@ -9,6 +9,8 @@ import DetailedReportsPage from "./pages/DetailedReportsPage";
 import MarketersPage from "./pages/MarketersPage";
 import MarketerProfilePage from "./pages/MarketerProfilePage";
 import LinksCodes from "./pages/LinksCodes";
+import RequsetWithdrawal from "./pages/RequsetWithdrawal";
+import RequsetIinfo from "./pages/InfoRequest";
 import CompaniesPage from "./pages/CompaniesPage";
 import AddCompanyPage from "./pages/AddCompanyPage";
 import AddReferral from "./pages/AddReferral";
@@ -17,6 +19,7 @@ import AddCode from "./pages/AddCode";
 import EditCode from "./pages/EditCode";
 import EditCompanyPage from "./pages/EditCompanyPage";
 import AddReferralRequests from "./pages/AddRequestReferral";
+import AddRequestCode from "./pages/AddRequestCode";
 import RequestsPage from "./pages/RequestsPage";
 import UploadExcelReferral from "./pages/UploadExcelReferral";
 import UploadExcelCode from "./pages/UploadExcelCode";
@@ -50,10 +53,13 @@ const App = () => (
             <Route path="reports" element={<DetailedReportsPage />} />
             <Route path="marketers" element={<MarketersPage />} />
             <Route path="marketers/:id" element={<MarketerProfilePage />} />
-            <Route path="linksCodes" element={<LinksCodes />} />
             <Route path="companies" element={<CompaniesPage />} />
             <Route path="companies/add" element={<AddCompanyPage />} />
             <Route path="companies/edit/:id" element={<EditCompanyPage />} />
+            <Route path="withdrawals" element={<WithdrawalsPage />} />
+            <Route path="requsetWithdrawal" element={<RequsetWithdrawal />} />
+            <Route path="requsetWithdrawal/info/:id" element={<RequsetIinfo />} />
+            <Route path="linksCodes" element={<LinksCodes />} />
             <Route path="LinksCodes/addReferral" element={<AddReferral />} />
             <Route path="LinksCodes/addReferral" element={<AddReferral />} />
             <Route path="LinksCodes/editReferral/:id" element={<EditReferral />} />
@@ -63,7 +69,7 @@ const App = () => (
             <Route path="LinksCodes/UploadExcelCode" element={<UploadExcelCode />} />
             <Route path="requests" element={<RequestsPage />} />
             <Route path="requests/addReferral/:id" element={<AddReferralRequests />} />
-            <Route path="withdrawals" element={<WithdrawalsPage />} />
+            <Route path="requests/addCode/:id" element={<AddRequestCode />} />
             <Route path="community" element={<CommunityPage />} />
             <Route path="achievements" element={<AchievementsPage />} />
             <Route path="verification" element={<VerificationPage />} />

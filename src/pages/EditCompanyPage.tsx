@@ -203,9 +203,11 @@ const EditCompanyPage = () => {
     }
   }, [id]);
 
+
   if (!BrandData) {
-    return <div className="container mx-auto p-6">Loading...</div>;
+    return <div className="container mx-auto p-6">جاري التحميل...</div>;
   }
+
 
   return (
     <div className="container mx-auto p-6 max-w-4xl space-y-6">

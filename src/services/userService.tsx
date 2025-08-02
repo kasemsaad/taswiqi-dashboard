@@ -99,6 +99,7 @@ export const GetReferralRequestById = async (id: string): Promise<UsersServices>
   const response = await Api.get<UsersServices>(`referral-requests/${id}`);
   return response.data;
 };
+
 export const GetBrandById = async (id: string): Promise<UsersServices> => {
   const response = await Api.get<UsersServices>(`brands/${id}`);
   return response.data;
@@ -180,6 +181,23 @@ export const GetcodeById= async (id:string
 };
 
 
+export const GetAllWithdrawRequests = async (params?: GetParams
+): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>(`withdraw-requests`, {
+    params,
+  });
+  return response.data;
+};
+export const GetWithdrawRequestsById= async (id:string
+): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>(`withdraw-requests/${id}`);
+  return response.data;
+};
+export const WithdrawStatus= async (id:string,status:string
+): Promise<UsersServices> => {
+  const response = await Api.put<UsersServices>(`withdraw-requests/update-status/${id}/${status}`);
+  return response.data;
+};
 export const GetAllReferralLinkspage = async (params?: GetParams
 ): Promise<UsersServices> => {
   const response = await Api.get<UsersServices>(`referral-link`, {
@@ -199,9 +217,23 @@ export const GetNumbersCodes= async (): Promise<UsersServices> => {
   const response = await Api.get<UsersServices>(`discount-code/get-numbers`);
   return response.data;
 };
+export const GetAllReferralpage = async (  params?: GetParams
+): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>(`referral-link`, {
+    params,
+  });
+  return response.data;
+};
 export const GetAllCodespage = async (  params?: GetParams
 ): Promise<UsersServices> => {
   const response = await Api.get<UsersServices>(`referral-link`, {
+    params,
+  });
+  return response.data;
+};
+export const GetAllCodes = async (  params?: GetParams
+): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>(`discount-code`, {
     params,
   });
   return response.data;

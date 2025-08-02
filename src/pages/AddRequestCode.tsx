@@ -11,7 +11,7 @@ import { ArrowRight, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   CreateRequest,
-  GetAllReferralpage,
+  GetAllCodes,
   GetReferralRequestById,
 } from "@/services/userService";
 import {
@@ -24,10 +24,10 @@ import {
 import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup } from "@/components/ui/command";
 
 const validationSchema = Yup.object().shape({
-  referral_link_id: Yup.string().required("رابط الإحالة مطلوب"),
+  discount_code_id: Yup.string().required("كود خصم مطلوب"),
 });
 
-const AddReferralPage = () => {
+const AddCodePage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { id } = useParams();
@@ -67,7 +67,7 @@ const AddReferralPage = () => {
 
   const fetchCodeList = async (search: string) => {
     try {
-      const response = await GetAllReferralpage({
+      const response = await GetAllCodes({
         searchTerm: search || undefined,
       });
       const CodeData = Array.isArray(response?.data) ? response.data : [];
@@ -85,9 +85,9 @@ const AddReferralPage = () => {
 
   const formik = useFormik({
     initialValues: {
-      type: "referral_link",
+      type: "discount_code",
       referral_request_id: id,
-      referral_link_id: "",
+      discount_code_id: "",
     },
     validationSchema,
     onSubmit: async (values) => {
@@ -96,14 +96,14 @@ const AddReferralPage = () => {
         await CreateRequest(values);
         toast({
           title: "تم بنجاح",
-          description: "تم إسناد رابط الإحالة بنجاح",
+          description: "تم إسناد كود خصم بنجاح",
           variant: "success",
         });
         navigate("/requests");
       } catch (error) {
         toast({
           title: "خطأ",
-          description: "رابط الإحالة محجوز",
+          description: "كود الخصم محجوز",
           variant: "destructive",
         });
       } finally {
@@ -181,25 +181,25 @@ const AddReferralPage = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>إسناد رابط الإحالة</CardTitle>
+            <CardTitle>إسناد كود خصم</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="referral_link_id">رابط الإحالة *</Label>
+                <Label htmlFor="discount_code_id">كود خصم *</Label>
                 <Select
-                  value={formik.values.referral_link_id}
+                  value={formik.values.discount_code_id}
                   onValueChange={(value) => {
-                    formik.setFieldValue("referral_link_id", value);
+                    formik.setFieldValue("discount_code_id", value);
                   }}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="اختر رابط الإحالة" />
+                    <SelectValue placeholder="اختر كود خصم" />
                   </SelectTrigger>
                   <SelectContent>
                     <Command shouldFilter={false}>
                       <CommandInput
-                        placeholder="ابحث عن رابط..."
+                        placeholder="ابحث عن كود..."
                         value={searchTerm}
                         onValueChange={setSearchTerm}
                       />
@@ -208,7 +208,7 @@ const AddReferralPage = () => {
                         <CommandGroup>
                           {codes.map((code) => (
                             <SelectItem key={code.id} value={code.id}>
-                              {code.link}
+                              {code.code}
                             </SelectItem>
                           ))}
                         </CommandGroup>
@@ -216,10 +216,10 @@ const AddReferralPage = () => {
                     </Command>
                   </SelectContent>
                 </Select>
-                {formik.touched.referral_link_id &&
-                  formik.errors.referral_link_id && (
+                {formik.touched.discount_code_id &&
+                  formik.errors.discount_code_id && (
                     <div className="text-sm text-red-500">
-                      {formik.errors.referral_link_id}
+                      {formik.errors.discount_code_id}
                     </div>
                   )}
               </div>
@@ -239,7 +239,7 @@ const AddReferralPage = () => {
           </Button>
           <Button type="submit" className="gap-2" disabled={isSubmitting}>
             <Save className="w-4 h-4" />
-            إسناد رابط الإحالة
+            إسناد كود خصم
           </Button>
         </div>
       </form>
@@ -247,4 +247,4 @@ const AddReferralPage = () => {
   );
 };
 
-export default AddReferralPage;
+export default AddCodePage;

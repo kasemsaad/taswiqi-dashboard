@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building } from "lucide-react";
+// import { Building } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { GeneralTable } from "@/components/ui/tableCustom";
@@ -9,33 +9,33 @@ import { TableColumn } from "@/components/ui/tableCustom";
 import {
   GetRequests,
   GetNumbersRequstes,
-  GetAllCategories,
+  // GetAllCategories,
 } from "@/services/userService";
 import { Users } from "@/components/interfaces/Interfaces";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
 import { Search } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import company from "@/assets/icons/companies.svg";
+// import { Badge } from "@/components/ui/badge";
+// import { Button } from "@/components/ui/button";
+// import company from "@/assets/icons/companies.svg";
 import Linka from "@/assets/icons/link.svg";
-import { toast } from "@/hooks/use-toast";
+// import { toast } from "@/hooks/use-toast";
 
 export default function MarketersPage() {
   // const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("");
+  // const [statusFilter, setStatusFilter] = useState("");
+  // const [categoryFilter, setCategoryFilter] = useState("");
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [Request, setRequest] = useState([] as Users[]);
-  const [CategoriesRequests, setCategoriesRequests] = useState<any>(null);
+  // const [CategoriesRequests, setCategoriesRequests] = useState<any>(null);
 
   const [RequestNumbers, setRequestNumbers] = useState({
     activeRequest: 0,
@@ -47,20 +47,20 @@ export default function MarketersPage() {
 
   const fetchRequestData = async () => {
     try {
-      console.log("statusFilter:", statusFilter);
-      console.log("categoryFilter:", categoryFilter);
+      // console.log("statusFilter:", statusFilter);
+      // console.log("categoryFilter:", categoryFilter);
       setLoading(true);
       const response = await GetRequests({
         page,
         per_page: perPage,
         searchTerm: searchTerm || undefined,
-        filter:
-          statusFilter !== "all" || categoryFilter !== "all"
-            ? {
-                is_active: statusFilter ?? null,
-                category_id: categoryFilter ?? null,
-              }
-            : undefined,
+        // filter:
+        //   statusFilter !== "all" || categoryFilter !== "all"
+        //     ? {
+        //         is_active: statusFilter ?? null,
+        //         category_id: categoryFilter ?? null,
+        //       }
+        //     : undefined,
       });
       const Requestpage = response as any;
       const RequestData = response.data as Users[];
@@ -84,20 +84,20 @@ export default function MarketersPage() {
       console.error("Error fetching country data:", error);
     }
   };
-  const fetchCategories = async () => {
-    try {
-      const response = await GetAllCategories();
-      setCategoriesRequests(response.data || []);
-    } catch (error) {
-      console.error("Error fetching Categories:", error);
-    }
-  };
+  // const fetchCategories = async () => {
+  //   try {
+  //     // const response = await GetAllCategories();
+  //     // setCategoriesRequests(response.data || []);
+  //   } catch (error) {
+  //     console.error("Error fetching Categories:", error);
+  //   }
+  // };
  
   useEffect(() => {
     fetchRequestData();
     fetchRequstesNumbers();
-    fetchCategories();
-  }, [page, perPage, searchTerm, statusFilter, categoryFilter]);
+    // fetchCategories();
+  }, [page, perPage, searchTerm, ]);
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
