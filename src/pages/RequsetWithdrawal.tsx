@@ -7,10 +7,10 @@ import { GeneralTable } from "@/components/ui/tableCustom";
 import { TableColumn } from "@/components/ui/tableCustom";
 import {
   // deleteDiscountCode,
-  // deleteReferralLink,
+  // deleteWithdrawRequestsLink,
   GetAllWithdrawRequests,
-  GetAllCodespage,
-  // GetNumbersReferralLinks,
+  GetCustomersWithBalance,
+  // GetNumbersWithdrawRequestsLinks,
   // GetNumbersCodes,
 } from "@/services/userService";
 import {
@@ -23,125 +23,66 @@ import {
 import { Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 // import { Button } from "@/components/ui/button";
-// import Delete from "@/assets/icons/delete.svg";
+import right from "@/assets/icons/right.svg";
+import refused from "@/assets/icons/refused.svg";
 import info from "@/assets/icons/info.svg";
 // import Eye from "@/assets/icons/eye.svg";
 // import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-// import {
-//   DropdownMenu,
-//   DropdownMenuTrigger,
-//   DropdownMenuContent,
-//   DropdownMenuItem,
-// } from "@/components/ui/dropdown-menu";
 
 export default function MarketersPage() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
-  // Separate pagination states for referral links
-  const [referralPage, setReferralPage] = useState(1);
-  const [referralPerPage, setReferralPerPage] = useState(10);
-  const [referralTotalItems, setReferralTotalItems] = useState(0);
+  // Separate pagination states for WithdrawRequests links
+  const [WithdrawRequestsPage, setWithdrawRequestsPage] = useState(1);
+  const [WithdrawRequestsPerPage, setWithdrawRequestsPerPage] = useState(10);
+  const [WithdrawRequestsTotalItems, setWithdrawRequestsTotalItems] = useState(0);
 
   // Separate pagination states for discount codes
   const [codesPage, setCodesPage] = useState(1);
   const [codesPerPage, setCodesPerPage] = useState(10);
   const [codesTotalItems, setCodesTotalItems] = useState(0);
 
-  const [Referral, setReferral] = useState<any>(null);
+  const [WithdrawRequests, setWithdrawRequests] = useState<any>(null);
   const [Codes, setCodes] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<"requestes" | "codes">(
+  const [activeTab, setActiveTab] = useState<"requestes" | "accountDetection">(
     "requestes"
   );
-
-
-
   const [loading, setLoading] = useState(false);
 
-  // Fetch statistics for both tables
-  // const fetchStats = async () => {
-  //   try {
-  //     const [referralRes, codesRes] = await Promise.all([
-  //       GetNumbersReferralLinks(),
-  //       GetNumbersCodes(),
-  //     ]);
-  
-  //   } catch (error) {
-  //     console.error("Error fetching statistics:", error);
-  //   }
-  // };
-
-  // Delete a referral link
-  // const deleteReferral = async (id) => {
-  //   try {
-  //     await deleteReferralLink(id);
-  //     fetchReferral();
-  //     toast({
-  //       title: "تم الحذف",
-  //       description: "تم حذف رابط الإحالة بنجاح",
-  //       variant: "destructive",
-  //     });
-  //   } catch (error) {
-  //     toast({
-  //       title: "خطأ في الحذف",
-  //       description: "حدث خطأ أثناء حذف رابط الإحالة",
-  //       variant: "destructive",
-  //     });
-  //   }
-  // };
-
-  // Delete a discount code
-  // const deleteCode = async (id) => {
-  //   try {
-  //     await deleteDiscountCode(id);
-  //     fetchCodes();
-  //     toast({
-  //       title: "تم الحذف",
-  //       description: "تم حذف كود الخصم بنجاح",
-  //       variant: "destructive",
-  //     });
-  //   } catch (error) {
-  //     toast({
-  //       title: "خطأ في الحذف",
-  //       description: "حدث خطأ أثناء حذف كود الخصم",
-  //       variant: "destructive",
-  //     });
-  //   }
-  // };
-
-  // Fetch referral links data
-  const fetchReferral = async () => {
+  // Fetch WithdrawRequests links data
+  const fetchWithdrawRequests = async () => {
     try {
       setLoading(true);
       const response = await GetAllWithdrawRequests({
-        page: referralPage,
-        per_page: referralPerPage,
+        page: WithdrawRequestsPage,
+        per_page: WithdrawRequestsPerPage,
         searchTerm: searchTerm || undefined,
         filter: statusFilter !== "all" ? { status: statusFilter } : undefined,
       });
 
-      setReferral(response.data);
+      setWithdrawRequests(response.data);
       if (response.meta) {
-        setReferralTotalItems(response.meta.total);
+        setWithdrawRequestsTotalItems(response.meta.total);
       }
     } catch (error) {
-      console.error("Error fetching referral data:", error);
+      console.error("Error fetching WithdrawRequests data:", error);
     } finally {
       setLoading(false);
     }
   };
 
   // Fetch discount codes data
-  const fetchCodes = async () => {
+  const fetchCustomersWithBalance = async () => {
     try {
       setLoading(true);
-      const response = await GetAllCodespage({
+      const response = await GetCustomersWithBalance({
         page: codesPage,
         per_page: codesPerPage,
         searchTerm: searchTerm || undefined,
-        filter: statusFilter !== "all" ? { status: statusFilter } : undefined,
+       payment_status: statusFilter,
       });
 
       setCodes(response.data);
@@ -149,7 +90,7 @@ export default function MarketersPage() {
         setCodesTotalItems(response.meta.total);
       }
     } catch (error) {
-      console.error("Error fetching codes data:", error);
+      console.error("Error fetching accountDetection data:", error);
     } finally {
       setLoading(false);
     }
@@ -158,130 +99,27 @@ export default function MarketersPage() {
   // Handle search
   const handleSearch = (term: string) => {
     setSearchTerm(term);
-    setReferralPage(1);
+    setWithdrawRequestsPage(1);
     setCodesPage(1);
   };
 
-  // Initial data fetch
-  useEffect(() => {
-    // fetchStats();
-  }, []);
 
   // Fetch data when pagination or filters change
   useEffect(() => {
     if (activeTab === "requestes") {
-      fetchReferral();
+      fetchWithdrawRequests();
     } else {
-      fetchCodes();
+      fetchCustomersWithBalance();
     }
   }, [
-    referralPage,
-    referralPerPage,
+    WithdrawRequestsPage,
+    WithdrawRequestsPerPage,
     codesPage,
     codesPerPage,
     searchTerm,
     statusFilter,
     activeTab,
   ]);
-
-  // Columns for referral links table
-  // const ReferralColumns: TableColumn[] = [
-  //   {
-  //     key: "link",
-  //     header: "الرابط",
-  //     render: (marketer) => (
-  //       <div className="space-y-1">
-  //         <div className="text-sm">{marketer.link}</div>
-  //       </div>
-  //     ),
-  //   },
-  //   {
-  //     key: "brand",
-  //     header: "الشركة",
-  //     render: (marketer) => (
-  //       <div className="space-y-1">
-  //         <div className="text-sm">{marketer.brand}</div>
-  //       </div>
-  //     ),
-  //   },
-  //   {
-  //     key: "for_user",
-  //     header: "مخصّص ل",
-  //     render: (marketer) => (
-  //       <div className="space-y-1">
-  //         <div className="text-sm">{marketer.for_user}</div>
-  //       </div>
-  //     ),
-  //   },
-  //   {
-  //     key: "created_at",
-  //     header: "تاريخ الإضافة",
-  //     render: (marketer) => (
-  //       <div className="space-y-1">
-  //         <div className="text-sm">{marketer.created_at}</div>
-  //       </div>
-  //     ),
-  //   },
-  //   {
-  //     key: "usered_at",
-  //     header: "تاريخ آخر استخدام",
-  //     render: (marketer) => (
-  //       <div className="space-y-1">
-  //         <div className="text-sm">{marketer.usered_at}</div>
-  //       </div>
-  //     ),
-  //   },
-  //   {
-  //     key: "total_clients",
-  //     header: "عدد الإحالات",
-  //     render: (marketer) => (
-  //       <div className="space-y-1">
-  //         <div className="text-sm">{marketer.total_clients}</div>
-  //       </div>
-  //     ),
-  //   },
-  //   {
-  //     key: "status",
-  //     header: "الحالة",
-  //     render: (marketer) => (
-  //       <Badge
-  //         className={
-  //           marketer.status == "approved"
-  //             ? "status-active"
-  //             : marketer.status == "rejected"
-  //             ? "status-inactive"
-  //             : "status-pending"
-  //         }
-  //       >
-  //         {marketer.status == "approved"
-  //           ? "ناجحة"
-  //           : marketer.status == "rejected"
-  //           ? "مرفوضة"
-  //           : "قيد الإنتظار"}
-  //       </Badge>
-  //     ),
-  //   },
-  //   {
-  //     key: "id",
-  //     header: "اجراءات",
-  //     render: (marketer) => (
-  //       <div className="font-medium ps-5 gap-2 flex">
-  //         <button
-  //           onClick={() => navigate(`editReferral/${marketer.id}`)}
-  //           className="text-muted-foreground hover:text-destructive"
-  //         >
-  //           <img src={Eye} alt="view" />
-  //         </button>
-  //         <button
-  //           onClick={() => deleteReferral(marketer.id)}
-  //           className="text-muted-foreground hover:text-destructive"
-  //         >
-  //           <img src={Delete} alt="delete" />
-  //         </button>
-  //       </div>
-  //     ),
-  //   },
-  // ];
 
   // Columns for discount codes table
   const requestColumns: TableColumn[] = [
@@ -330,26 +168,18 @@ export default function MarketersPage() {
         </div>
       ),
     },
-    // {
-    //   key: "total_clients",
-    //   header: "تاريخ الإجراء",
-    //   render: (marketer) => (
-    //     <div className="space-y-1">
-    //       <div className="text-sm">{marketer.total_clients}</div>
-    //     </div>
-    //   ),
-    // },
     {
       key: "status",
       header: "الحالة",
       render: (marketer) => (
         <Badge
-        className={
+          className={
             marketer.status == "approved"
               ? "status-active"
               : marketer.status == "rejected"
               ? "status-inactive"
-              : "status-pending"}
+              : "status-pending"
+          }
         >
           {marketer.status == "approved"
             ? "ناجحة"
@@ -374,7 +204,74 @@ export default function MarketersPage() {
       ),
     },
   ];
-
+  //  Columns for WithdrawRequests links table
+  const accountDetectionColumns: TableColumn[] = [
+    {
+      key: "name",
+      header: "أسم المسوّق",
+      render: (marketer) => (
+        <div className="space-y-1">
+          <div className="text-sm">{marketer.name}</div>
+        </div>
+      ),
+    },
+    {
+      key: "total_earnings",
+      header: "إجمالي الأرباح",
+      render: (marketer) => (
+        <div className="space-y-1">
+          <div className="text-sm">{marketer.total_earnings}</div>
+        </div>
+      ),
+    },
+    {
+      key: "withdrawn_amount",
+      header: "سحب سابقًا",
+      render: (marketer) => (
+        <div className="space-y-1">
+          <div className="text-sm">{marketer.withdrawn_amount}</div>
+        </div>
+      ),
+    },
+    {
+      key: "total_balance",
+      header: "المتبقي له",
+      render: (marketer) => (
+        <div className="space-y-1">
+          <div className="text-sm">{marketer.total_balance}</div>
+        </div>
+      ),
+    },
+    {
+      key: "can_withdraw",
+      header: "مؤهل للسحب؟",
+      render: (marketer) => (
+        <div className="space-y-1">
+          <div className="text-sm">
+            {marketer.can_withdraw ? (
+              <img src={right} alt="right" />
+            ) : (
+              <img src={refused} alt="refused" />
+            )}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: "id",
+      header: "كشف حساب",
+      render: (marketer) => (
+        <div className="font-medium ps-5 flex gap-2">
+          <button
+            onClick={() => navigate(`infoCustomers/${marketer.id}`)}
+            className="text-muted-foreground hover:text-destructive"
+          >
+            <img src={info} alt="info" />
+          </button>
+        </div>
+      ),
+    },
+  ];
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -384,7 +281,6 @@ export default function MarketersPage() {
           <p className="text-muted-foreground mt-1">قائمة بجميع طلبات السحب </p>
         </div>
       </div>
-
       {/* Search and Filter */}
       <Card className="dashboard-card">
         <CardHeader>
@@ -403,11 +299,11 @@ export default function MarketersPage() {
                 />
               </div>
             </div>
-            <Select
+          { activeTab =="requestes"&& <Select
               value={statusFilter}
               onValueChange={(value) => {
                 setStatusFilter(value);
-                setReferralPage(1);
+                setWithdrawRequestsPage(1);
                 setCodesPage(1);
               }}
             >
@@ -420,7 +316,24 @@ export default function MarketersPage() {
                 <SelectItem value="rejected">مرفوضة</SelectItem>
                 <SelectItem value="pending">قيد الإنتظار</SelectItem>
               </SelectContent>
-            </Select>
+            </Select>}
+           { activeTab =="accountDetection"&& <Select
+              value={statusFilter}
+              onValueChange={(value) => {
+                setStatusFilter(value);
+                setWithdrawRequestsPage(1);
+                setCodesPage(1);
+              }}
+            >
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="تصفية حسب المؤهل " />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">المؤهلات</SelectItem>
+                <SelectItem value="qualified">مؤهل</SelectItem>
+                <SelectItem value="Disqualified">غير مؤهل</SelectItem>
+              </SelectContent>
+            </Select>}
           </div>
         </CardContent>
       </Card>
@@ -434,29 +347,32 @@ export default function MarketersPage() {
           >
             طلبات السحب{" "}
           </TabsTrigger>
-          <TabsTrigger value="codes" onClick={() => setActiveTab("codes")}>
-            أكواد الخصم
+          <TabsTrigger
+            value="accountDetection"
+            onClick={() => setActiveTab("accountDetection")}
+          >
+            كشف حساب المسوّقين{" "}
           </TabsTrigger>
         </TabsList>
 
-        {/* Referral Links Table */}
+        {/* WithdrawRequests Links Table */}
         <TabsContent value="requestes" className="space-y-4" dir="rtl">
           <Card className="dashboard-card">
             <CardHeader>
               <CardTitle>طلبات السحب </CardTitle>
             </CardHeader>
             <GeneralTable
-              data={Referral}
+              data={WithdrawRequests}
               columns={requestColumns}
               loading={loading}
               pagination={{
-                page: referralPage,
-                perPage: referralPerPage,
-                total: referralTotalItems,
-                onPageChange: (newPage) => setReferralPage(newPage),
+                page: WithdrawRequestsPage,
+                perPage: WithdrawRequestsPerPage,
+                total: WithdrawRequestsTotalItems,
+                onPageChange: (newPage) => setWithdrawRequestsPage(newPage),
                 onPerPageChange: (newPerPage) => {
-                  setReferralPerPage(newPerPage);
-                  setReferralPage(1);
+                  setWithdrawRequestsPerPage(newPerPage);
+                  setWithdrawRequestsPage(1);
                 },
               }}
             />
@@ -464,14 +380,14 @@ export default function MarketersPage() {
         </TabsContent>
 
         {/* Discount Codes Table */}
-        <TabsContent value="codes" className="space-y-4" dir="rtl">
+        <TabsContent value="accountDetection" className="space-y-4" dir="rtl">
           <Card className="dashboard-card">
             <CardHeader>
-              <CardTitle>طلبات السحب </CardTitle>
+              <CardTitle> كشف حساب المسوّقين </CardTitle>
             </CardHeader>
             <GeneralTable
               data={Codes}
-              columns={requestColumns}
+              columns={accountDetectionColumns}
               loading={loading}
               pagination={{
                 page: codesPage,

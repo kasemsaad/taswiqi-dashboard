@@ -42,8 +42,9 @@ export interface GetParams {
     status?: string;
         is_active?: string; // إذا كانت القيم محصورة
         category_id?: string; // إذا كانت القيم محصورة
-
-  };
+        
+      };
+      payment_status?: string; // إذا كانت القيم محصورة
 }
 
 

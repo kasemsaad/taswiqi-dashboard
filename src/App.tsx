@@ -11,6 +11,7 @@ import MarketerProfilePage from "./pages/MarketerProfilePage";
 import LinksCodes from "./pages/LinksCodes";
 import RequsetWithdrawal from "./pages/RequsetWithdrawal";
 import RequsetIinfo from "./pages/InfoRequest";
+import InfoCustomersWithBalance from "./pages/InfoCustomersWithBalance";
 import CompaniesPage from "./pages/CompaniesPage";
 import AddCompanyPage from "./pages/AddCompanyPage";
 import AddReferral from "./pages/AddReferral";
@@ -59,6 +60,7 @@ const App = () => (
             <Route path="withdrawals" element={<WithdrawalsPage />} />
             <Route path="requsetWithdrawal" element={<RequsetWithdrawal />} />
             <Route path="requsetWithdrawal/info/:id" element={<RequsetIinfo />} />
+            <Route path="requsetWithdrawal/infoCustomers/:id" element={<InfoCustomersWithBalance />} />
             <Route path="linksCodes" element={<LinksCodes />} />
             <Route path="LinksCodes/addReferral" element={<AddReferral />} />
             <Route path="LinksCodes/addReferral" element={<AddReferral />} />

@@ -205,6 +205,20 @@ export const GetAllReferralLinkspage = async (params?: GetParams
   });
   return response.data;
 };
+export const GetCustomersWithBalance = async (params?: GetParams
+): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>(`customers/get-customers-with-balance`, {
+    params,
+  });
+  return response.data;
+};
+export const GetCustomersWalletTransactions = async (id?:string,params?: GetParams
+): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>(`customers/get-customer-wallet-transactions/${id}`, {
+    params,
+  });
+  return response.data;
+};
 export const GetAllReferralLinks = async (id: string): Promise<UsersServices> => {
   const response = await Api.get<UsersServices>(`customers/get-referrals/${id}/referral_link`);
   return response.data;
