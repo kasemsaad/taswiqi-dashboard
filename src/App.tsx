@@ -8,27 +8,31 @@ import ReportsPage from "./pages/ReportsPage";
 import DetailedReportsPage from "./pages/DetailedReportsPage";
 import MarketersPage from "./pages/MarketersPage";
 import MarketerProfilePage from "./pages/MarketerProfilePage";
-import LinksCodes from "./pages/LinksCodes";
-import RequsetWithdrawal from "./pages/RequsetWithdrawal";
-import RequsetIinfo from "./pages/InfoRequest";
-import InfoCustomersWithBalance from "./pages/InfoCustomersWithBalance";
-import CompaniesPage from "./pages/CompaniesPage";
-import AddCompanyPage from "./pages/AddCompanyPage";
-import AddReferral from "./pages/AddReferral";
-import EditReferral from "./pages/EditReferral";
-import AddCode from "./pages/AddCode";
-import EditCode from "./pages/EditCode";
-import EditCompanyPage from "./pages/EditCompanyPage";
-import AddReferralRequests from "./pages/AddRequestReferral";
-import AddRequestCode from "./pages/AddRequestCode";
-import RequestsPage from "./pages/RequestsPage";
-import UploadExcelReferral from "./pages/UploadExcelReferral";
-import UploadExcelCode from "./pages/UploadExcelCode";
-import WithdrawalsPage from "./pages/WithdrawalsPage";
+import LinksCodes from "./pages/markter/ReferralCode/LinksCodes";
+import RequsetWithdrawal from "./pages/markter/Withdrawal/RequsetWithdrawal";
+import RequsetIinfo from "./pages/markter/Withdrawal/InfoRequest";
+import InfoCustomersWithBalance from "./pages/markter/Withdrawal/InfoCustomersWithBalance";
+import CompaniesPage from "./pages/markter/companies/CompaniesPage";
+import AddCompanyPage from "./pages/markter/companies/AddCompanyPage";
+import Badges from "./pages/markter/Badges/BadgesPage";
+import AddBadgesPage from "./pages/markter/Badges/AddBadgePage";
+import EditBadgePage from "./pages/markter/Badges/EditBadgePage";
+import AddReferral from "./pages/markter/ReferralCode/AddReferral";
+import EditReferral from "./pages/markter/ReferralCode/EditReferral";
+import AddCode from "./pages/markter/ReferralCode/AddCode";
+import EditCode from "./pages/markter/ReferralCode/EditCode";
+import EditCompanyPage from "./pages/markter/companies/EditCompanyPage";
+import AddReferralRequests from "./pages/markter/Requestes/AddRequestReferral";
+import AddRequestCode from "./pages/markter/Requestes/AddRequestCode";
+import RequestsPage from "./pages/markter/Requestes/RequestsPage";
+import UploadExcelReferral from "./pages/markter/ReferralCode/UploadExcelReferral";
+import UploadExcelCode from "./pages/markter/ReferralCode/UploadExcelCode";
+import WithdrawalsPage from "./pages/markter/Withdrawal/WithdrawalsPage";
 import CommunityPage from "./pages/CommunityPage";
 import AchievementsPage from "./pages/AchievementsPage";
 import SupportPage from "./pages/SupportPage";
-import VerificationPage from "./pages/VerificationPage";
+import VerificationPage from "./pages/markter/Approval/VerificationPage";
+import EditVerificationPage from "./pages/markter/Approval/VerfcationRequest";
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/auth/Login";
@@ -55,6 +59,9 @@ const App = () => (
             <Route path="marketers" element={<MarketersPage />} />
             <Route path="marketers/:id" element={<MarketerProfilePage />} />
             <Route path="companies" element={<CompaniesPage />} />
+            <Route path="badges" element={<Badges />} />
+            <Route path="badges/add" element={<AddBadgesPage />} />
+            <Route path="badges/edit/:id" element={<EditBadgePage />} />
             <Route path="companies/add" element={<AddCompanyPage />} />
             <Route path="companies/edit/:id" element={<EditCompanyPage />} />
             <Route path="withdrawals" element={<WithdrawalsPage />} />
@@ -74,6 +81,7 @@ const App = () => (
             <Route path="requests/addCode/:id" element={<AddRequestCode />} />
             <Route path="community" element={<CommunityPage />} />
             <Route path="achievements" element={<AchievementsPage />} />
+            <Route path="verification/edit/:id" element={<EditVerificationPage />} />
             <Route path="verification" element={<VerificationPage />} />
             <Route path="support" element={<SupportPage />} />
             <Route path="settings" element={<SettingsPage />} />

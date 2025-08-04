@@ -85,6 +85,76 @@ export const GetRequests = async (  params?: GetParams
   });
   return response.data;
 };
+export const CreateBadge = async (
+  sendData: object
+): Promise<UsersServices> => {
+  const response = await Api.post<UsersServices>(`padges`, sendData);
+  return response.data;
+};
+export const GetHighestBadge = async (): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>(`padges/get-highest`);
+  return response.data;
+};
+export const GetBadgeNumbers = async (): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>(`padges/get-numbers`);
+  return response.data;
+};
+export const GetAllpadges = async (params?: GetParams
+): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>(`padges`, {
+    params,
+  });
+  return response.data;
+};
+export const deleteBadges = async (
+  id: string,
+): Promise<UsersServices> => {
+  const response = await Api.delete<UsersServices>(`padges/${id}`);
+  return response.data;
+};
+export const EditBadge = async (id: string,
+  sendData: object
+): Promise<UsersServices> => {
+  const response = await Api.post<UsersServices>(`padges/${id}`, sendData);
+  return response.data;
+};
+export const GetBadgeById = async (id: string): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>(`padges/${id}`);
+  return response.data;
+};
+export const EditSetting = async (
+  sendData: object
+): Promise<UsersServices> => {
+  const response = await Api.post<UsersServices>(`settings/update`, sendData);
+  return response.data;
+};
+export const GetAllSettings = async (): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>(`settings/get-all`);
+  return response.data;
+};
+export const GetApprovalById = async (id: string): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>(`approval-requests/${id}`);
+  return response.data;
+};
+export const EditApproval = async (id:string,
+  sendData: object
+): Promise<UsersServices> => {
+  const response = await Api.post<UsersServices>(`approval-requests/update-approval/${id}`, sendData);
+  return response.data;
+};
+export const GetAllApproval = async (params?: GetParams
+): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>(`approval-requests`, {
+    params,
+  });
+  return response.data;
+};
+export const DeleteApproval = async (
+  id: string,
+): Promise<UsersServices> => {
+  const response = await Api.delete<UsersServices>(`approval-requests/${id}`);
+  return response.data;
+};
 export const CreateRequest = async (
   sendData: object
 ): Promise<UsersServices> => {

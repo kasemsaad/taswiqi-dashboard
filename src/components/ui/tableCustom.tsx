@@ -283,13 +283,13 @@ export const GeneralTable = ({
         </Table>
       </div>
 
+          
       {pagination && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-2">
+        <div className="flex flex-col px-5 sm:flex-row items-center justify-between gap-4 py-2">
           <div className="text-sm text-muted-foreground">
             عرض {startItem}-{endItem} من {pagination.total} عنصر
           </div>
-          
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 px-5 py-2">
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">عناصر لكل صفحة:</span>
               <Select
@@ -309,7 +309,7 @@ export const GeneralTable = ({
               </Select>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 ">
               <Button
                 variant="outline"
                 size="sm"

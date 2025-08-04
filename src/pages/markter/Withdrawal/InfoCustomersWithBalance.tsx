@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, Save } from "lucide-react";
+import { ArrowRight, Save, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   GetCustomersWalletTransactions,
@@ -19,16 +19,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search } from "lucide-react";
 
 const InfoRequestPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { id } = useParams();
   const [requestData, setRequestData] = useState<any>(null);
-  const [transactionsData, setTransactionsData] = useState<any>(null);
+  const [transactionsData, setTransactionsData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-//////////////////////////////////////////////////////
+  
+  // Pagination state
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
@@ -37,9 +37,8 @@ const InfoRequestPage = () => {
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
-    setPage(1);
+    setPage(1); // Reset to first page when searching
   };
-
 
   const marketersColumns: TableColumn[] = [
     {
@@ -52,11 +51,11 @@ const InfoRequestPage = () => {
       ),
     },
     {
-      key: "name",
+      key: "created_at",
       header: "التاريخ",
       render: (marketer) => (
         <div className="space-y-1">
-          <div className="font-medium">{marketer.name}</div>
+          <div className="font-medium">{marketer.created_at}</div>
         </div>
       ),
     },
@@ -65,7 +64,13 @@ const InfoRequestPage = () => {
       header: "نوع العملية",
       render: (marketer) => (
         <div className="space-y-1">
-          <div className="text-sm">{marketer.type=="withdraw"?"سحب":marketer.type=="referral_link_earnings"?"عمولة رابط إحاله ":"عمولة كود خصم"}</div>
+          <div className="text-sm">
+            {marketer.type === "withdraw" 
+              ? "سحب" 
+              : marketer.type === "referral_link_earnings" 
+                ? "عمولة رابط إحاله" 
+                : "عمولة كود خصم"}
+          </div>
         </div>
       ),
     },
@@ -82,27 +87,49 @@ const InfoRequestPage = () => {
       key: "withdraw_method",
       header: "وسيلة السحب",
       render: (marketer) => (
-        <div className="font-medium">{marketer.withdraw_method}</div>
+        <div className="font-medium">{marketer.withdraw_method || "-"}</div>
       ),
     }, 
   ];
-/////////////////////////////////////////////////////
-  const fetchRequestData = async (id: string) => {
+
+  interface WalletTransactionsResponse {
+    data: {
+      customer_info: any;
+      transactions_data: {
+        transactions: any[];
+        meta: {
+          current_page: number;
+          per_page: number;
+          total: number;
+          last_page: number;
+        };
+      };
+    };
+  }
+
+  const fetchRequestData = async () => {
+    if (!id) return;
+    
+    setIsLoading(true);
     try {
-      const response = await GetCustomersWalletTransactions(id);
-      setRequestData((response.data as { customer_info: any }).customer_info);
-      setTransactionsData((response.data as { transactions: any }).transactions);
-      //  const responsemeta =  response.data as { transactions: any }({
-      //   page,
-      //   per_page: perPage,
-      //   searchTerm: searchTerm || undefined,
-      //   filter: statusFilter !== "all" ? { status: statusFilter } : undefined
-      // });
-      // const responsemeta = response.data as { transactions: any[] };
-      // const Customerpage = responsemeta as any;
-      // setPage(Customerpage.meta.current_page);
-      // setPerPage(Customerpage.meta.per_page);
-      // setTotalItems(Customerpage.meta.total);
+      const response = await GetCustomersWalletTransactions(
+        id as string,
+        {
+          page,
+          per_page: perPage,
+          searchTerm: searchTerm || undefined,
+          type: statusFilter !== "all" ? statusFilter : undefined
+        }
+      ) as WalletTransactionsResponse;
+
+      setRequestData(response.data.customer_info);
+      setTransactionsData(response.data.transactions_data.transactions);
+      
+      const { meta } = response.data.transactions_data;
+      setPage(meta.current_page);
+      setPerPage(meta.per_page);
+      setTotalItems(meta.total);
+      
     } catch (error) {
       console.error("Error fetching request data:", error);
       toast({
@@ -116,12 +143,10 @@ const InfoRequestPage = () => {
   };
 
   useEffect(() => {
-    if (id) {
-      fetchRequestData(id);
-    }
+    fetchRequestData();
   }, [id, page, perPage, searchTerm, statusFilter]);
 
-  if (isLoading) {
+  if (isLoading && !requestData) {
     return <div className="container mx-auto p-6">جاري التحميل...</div>;
   }
 
@@ -138,61 +163,57 @@ const InfoRequestPage = () => {
           className="gap-2"
         >
           <ArrowRight className="w-4 h-4 rotate-180" />
-          العوده طلبات السحب{" "}
+          العوده طلبات السحب
         </Button>
-        <h1 className="text-2xl font-bold">  تفاصيل كشف حساب  </h1>
+        <h1 className="text-2xl font-bold">تفاصيل كشف حساب</h1>
       </div>
 
       <form className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>معلومات  {requestData.name}</CardTitle>
+            <CardTitle>معلومات {requestData.name}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              
               <div className="space-y-2">
                 <Label>أسم المسوّق</Label>
                 <Input value={requestData.name} disabled />
               </div>
               <div className="space-y-2">
                 <Label>إجمالي الأرباح</Label>
-                <Input value={requestData.totalEarnings + "Rs"} disabled />
+                <Input value={`${requestData.totalEarnings} Rs`} disabled />
               </div>
               <div className="space-y-2">
                 <Label>سحب سابقًا</Label>
-                <Input value={requestData.withdrawn_amount  + "Rs"} disabled />
+                <Input value={`${requestData.withdrawn_amount} Rs`} disabled />
               </div>
               <div className="space-y-2">
                 <Label>المتبقي له</Label>
-                <Input value={requestData.total_balance + "Rs"} disabled />
+                <Input value={`${requestData.total_balance} Rs`} disabled />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* <Separator /> */}
-
-        {requestData?.status == "pending" && (
+        {requestData?.status === "pending" && (
           <div className="flex justify-end gap-4">
             <Button
               type="button"
               className="bg-red-600 text-white"
               variant="outline"
               onClick={() => {
-                WithdrawStatus(requestData?.id, "rejected"),
-                  toast({
-                    title: "تم رفض الطلب",
-                    description: " بنجاح تم رفض الطلب",
-                    variant: "destructive",
-                  });
-
+                WithdrawStatus(requestData?.id, "rejected");
+                toast({
+                  title: "تم رفض الطلب",
+                  description: "بنجاح تم رفض الطلب",
+                  variant: "destructive",
+                });
                 setTimeout(() => {
                   navigate("/requsetWithdrawal");
                 }, 1000);
               }}
             >
-              رفضل الطلب{" "}
+              رفض الطلب
             </Button>
             <Button
               className="bg-green-600 gap-2"
@@ -200,7 +221,7 @@ const InfoRequestPage = () => {
                 WithdrawStatus(requestData?.id, "approved");
                 toast({
                   title: "تم الموافقة علي الطلب",
-                  description: " بنجاح تم الموافقة الطلب",
+                  description: "بنجاح تم الموافقة الطلب",
                   variant: "success",
                 });
                 setTimeout(() => {
@@ -209,12 +230,13 @@ const InfoRequestPage = () => {
               }}
             >
               <Save className="w-4 h-4" />
-              الموافقة على الطلب{" "}
+              الموافقة على الطلب
             </Button>
           </div>
         )}
       </form>
-       <Card className="dashboard-card">
+
+      <Card className="dashboard-card">
         <CardHeader>
           <CardTitle>البحث والتصفية</CardTitle>
         </CardHeader>
@@ -239,12 +261,12 @@ const InfoRequestPage = () => {
               }}
             >
               <SelectTrigger className="w-48">
-                <SelectValue placeholder="تصفية حسب نوع العملية	" />
+                <SelectValue placeholder="تصفية حسب نوع العملية" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">جميع أنوع العمليات	</SelectItem>
+                <SelectItem value="all">جميع أنوع العمليات</SelectItem>
                 <SelectItem value="withdraw">سحب</SelectItem>
-                <SelectItem value="referral_link_earnings">عمولة رابط إحاله </SelectItem>
+                <SelectItem value="referral_link_earnings">عمولة رابط إحاله</SelectItem>
                 <SelectItem value="discount_code_earnings">عمولة كود الخصم</SelectItem>
               </SelectContent>
             </Select>
@@ -260,9 +282,6 @@ const InfoRequestPage = () => {
           data={transactionsData}
           columns={marketersColumns}
           loading={isLoading}
-          // actions={{
-          //   view: handleViewProfile,
-          // }}
           pagination={{
             page,
             perPage,
@@ -270,7 +289,7 @@ const InfoRequestPage = () => {
             onPageChange: setPage,
             onPerPageChange: (newPerPage) => {
               setPerPage(newPerPage);
-              setPage(1);
+              setPage(1); // Reset to first page when changing page size
             },
           }}
         />

@@ -38,6 +38,8 @@ export interface GetParams {
   page?: number;
   per_page?: number;
   searchTerm?: string;
+  type?: string;
+  status?: string;
   filter?: {
     status?: string;
         is_active?: string; // إذا كانت القيم محصورة
