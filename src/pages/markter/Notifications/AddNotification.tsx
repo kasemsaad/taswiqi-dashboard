@@ -24,7 +24,6 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 
 const NotificationsPage = () => {
-  const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);

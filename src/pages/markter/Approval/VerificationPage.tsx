@@ -27,7 +27,7 @@ import { Badge } from "@/components/ui/badge";
 import info from "@/assets/icons/info.svg";
 // import Eye from "@/assets/icons/eye.svg";
 // import { toast } from "@/hooks/use-toast";
-import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { Tabs } from "@/components/ui/tabs";
 
 export default function MarketersPage() {
   const navigate = useNavigate();
