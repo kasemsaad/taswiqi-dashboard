@@ -135,8 +135,8 @@ const handleExportTemplate = async () => {
 
   return (
     <div className="container mx-auto p-6 max-w-4xl space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
+      <div className="md:flex items-center justify-between mb-6">
+        <div className="md:flex items-center gap-4">
           <Button
             variant="ghost"
             onClick={() => navigate("/LinksCodes")}
@@ -148,7 +148,7 @@ const handleExportTemplate = async () => {
           <h1 className="text-2xl font-bold">إضافة كود خصم جديد</h1>
         </div>
         
-        <div className="flex gap-2">
+        <div className="md:flex gap-2">
           <Button 
             variant="outline" 
             onClick={handleExportTemplate}

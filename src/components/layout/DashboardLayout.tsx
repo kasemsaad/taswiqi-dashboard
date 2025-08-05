@@ -1,16 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { Role } from "../../redux/resourcesSlice";
-import  logo  from "@/assets/logo.svg";
+import logo from "@/assets/logo.svg";
 
 import { 
-  // BarChart3, 
   Users, 
   Building, 
   UserPlus, 
   Banknote, 
-  MessageSquare, 
   Award, 
+  Link, 
   Shield, 
   Settings,
   Menu,
@@ -18,12 +17,12 @@ import {
   User,
   Moon,
   Sun,
+  Megaphone,
   HeadphonesIcon,
-  BarChart,
-  Home
+  Home,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-// import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
@@ -87,23 +86,39 @@ const notifications = [
 const navigation = [
   { name: "الرئيسية", href: "/", icon: Home },
   { name: "المسوقين", href: "/marketers", icon: Users },
-  { name: "الروابط و الأكواد", href: "/LinksCodes", icon: MessageSquare },
-  // { name: "التقارير المفصلة", href: "/reports", icon: BarChart },
+  { name: "الروابط و الأكواد", href: "/LinksCodes", icon: Link },
   { name: "الشركات", href: "/companies", icon: Building },
   { name: "طلبات المسوقين", href: "/requests", icon: UserPlus },
   { name: "طلبات السحب", href: "/requsetWithdrawal", icon: Banknote },
-  // { name: "المجتمع", href: "/community", icon: MessageSquare },
   { name: "الشارات والإنجازات", href: "/badges", icon: Award },
   { name: "التحقق من الهوية", href: "/verification", icon: Shield },
+  { name: "الإشعارات", href: "/notification", icon: Megaphone },
   { name: "الدعم", href: "/support", icon: HeadphonesIcon },
   { name: "الإعدادات العامة", href: "/settings", icon: Settings },
 ];
 
 export default function DashboardLayout() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-const navigate = useNavigate();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024);
+      if (window.innerWidth >= 1024) {
+        setIsSidebarOpen(true);
+      } else {
+        setIsSidebarOpen(false);
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
     document.documentElement.classList.toggle('dark');
@@ -114,31 +129,35 @@ const navigate = useNavigate();
     dispatch(Role(""));
     navigate("/login");
   };
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Top Header */}
       <header className="bg-card border-b border-border sticky top-0 z-50">
-        <div className="flex items-center justify-between h-16 px-6">
-          <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between h-16 px-4 sm:px-6">
+          <div className="flex items-center gap-2 sm:gap-4">
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              onClick={toggleSidebar}
               className="lg:hidden"
             >
-              <Menu className="h-5 w-5" />
+              {isSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10">
-                {/* <span className="text-white font-bold text-sm">ت</span> */}
-                <img src={logo} alt="logo" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="h-8 w-8 sm:h-10 sm:w-10">
+                <img src={logo} alt="logo" className="w-full h-full" />
               </div>
-              <h1 className="text-xl font-bold">تسويقي - لوحة التحكم</h1>
+              <h1 className="text-lg sm:text-xl font-bold whitespace-nowrap">تسويقي - لوحة التحكم</h1>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={toggleDarkMode}>
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Button variant="ghost" size="sm" onClick={toggleDarkMode} className="hidden sm:flex">
               {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
             
@@ -151,30 +170,30 @@ const navigate = useNavigate();
                   </Badge>
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-80 p-0" align="end">
-                <div className="p-4 border-b">
-                  <h3 className="font-semibold">الاشعارات</h3>
+              <PopoverContent className="w-72 sm:w-80 p-0" align="end">
+                <div className="p-3 sm:p-4 border-b">
+                  <h3 className="font-semibold text-sm sm:text-base">الاشعارات</h3>
                 </div>
                 <div className="max-h-80 overflow-y-auto">
                   {notifications.map((notification) => (
                     <div 
                       key={notification.id} 
                       className={cn(
-                        "p-4 border-b hover:bg-muted/50 cursor-pointer transition-colors",
+                        "p-3 sm:p-4 border-b hover:bg-muted/50 cursor-pointer transition-colors",
                         notification.unread && "bg-muted/30"
                       )}
                     >
-                      <div className="flex items-start gap-3">
+                      <div className="flex items-start gap-2 sm:gap-3">
                         <div className={cn(
                           "h-2 w-2 rounded-full mt-2 flex-shrink-0",
                           notification.unread ? "bg-primary" : "bg-muted"
                         )} />
                         <div className="flex-1">
-                          <h4 className="font-medium text-sm">{notification.title}</h4>
-                          <p className="text-sm text-muted-foreground mt-1">
+                          <h4 className="font-medium text-xs sm:text-sm">{notification.title}</h4>
+                          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                             {notification.message}
                           </p>
-                          <p className="text-xs text-muted-foreground mt-2">
+                          <p className="text-xs text-muted-foreground mt-1 sm:mt-2">
                             {notification.time}
                           </p>
                         </div>
@@ -182,8 +201,8 @@ const navigate = useNavigate();
                     </div>
                   ))}
                 </div>
-                <div className="p-3 border-t">
-                  <Button variant="ghost" className="w-full text-sm">
+                <div className="p-2 sm:p-3 border-t">
+                  <Button variant="ghost" className="w-full text-xs sm:text-sm">
                     عرض جميع الاشعارات
                   </Button>
                 </div>
@@ -192,9 +211,24 @@ const navigate = useNavigate();
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="hidden sm:flex">
                   <User className="h-5 w-5" />
                   <span className="hidden md:block">المشرف العام</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem>الملف الشخصي</DropdownMenuItem>
+                <DropdownMenuItem>الإعدادات</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="text-destructive" onClick={handleLogout}>تسجيل خروج</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Mobile user dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="sm:hidden">
+                  <User className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
@@ -211,15 +245,19 @@ const navigate = useNavigate();
       <div className="flex">
         {/* Sidebar */}
         <aside className={cn(
-          "bg-sidebar border-l border-sidebar-border transition-all duration-300 ease-in-out",
-          isSidebarOpen ? "w-64" : "w-0 lg:w-16",
-          "h-[calc(100vh-4rem)] sticky top-16 overflow-hidden"
+          "bg-sidebar border-l border-sidebar-border  transition-all duration-300 ease-in-out",
+          "h-[calc(100vh-4rem)] fixed lg:sticky top-16 z-40",
+          "overflow-y-auto ",
+          isSidebarOpen ? "w-64" : "w-0",
+          "lg:w-64",
+          isMobile && !isSidebarOpen ? "hidden" : "block"
         )}>
-          <nav className="p-4 space-y-2">
+          <nav className="p-2 sm:p-4 space-y-1 sm:space-y-2">
             {navigation.map((item) => (
               <NavLink
                 key={item.name}
                 to={item.href}
+                onClick={() => isMobile && setIsSidebarOpen(false)}
                 className={({ isActive }) =>
                   cn(
                     "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
@@ -231,18 +269,27 @@ const navigate = useNavigate();
                 }
               >
                 <item.icon className="h-5 w-5 flex-shrink-0" />
-                {isSidebarOpen && <span className="truncate">{item.name}</span>}
+                <span className="truncate">{item.name}</span>
               </NavLink>
             ))}
           </nav>
         </aside>
 
+        {/* Overlay for mobile sidebar */}
+        {isSidebarOpen && isMobile && (
+          <div 
+            className="fixed  inset-0 bg-black/50 z-30 lg:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+
         {/* Main Content */}
         <main className={cn(
-          "flex-1 transition-all duration-300 ease-in-out",
-          "min-h-[calc(100vh-4rem)] bg-background"
+          "flex-1 w-full transition-all duration-300 ease-in-out",
+          "min-h-[calc(100vh-4rem)] bg-background",
+          isSidebarOpen && !isMobile ? "lg:ml-0" : "lg:ml-0"
         )}>
-          <div className="p-6">
+          <div className="p-4 sm:p-6  ">
             <Outlet />
           </div>
         </main>

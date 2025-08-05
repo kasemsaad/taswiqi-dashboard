@@ -33,6 +33,7 @@ import AchievementsPage from "./pages/AchievementsPage";
 import SupportPage from "./pages/SupportPage";
 import VerificationPage from "./pages/markter/Approval/VerificationPage";
 import EditVerificationPage from "./pages/markter/Approval/VerfcationRequest";
+import AddNotification from "./pages/markter/Notifications/AddNotification";
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/auth/Login";
@@ -83,6 +84,7 @@ const App = () => (
             <Route path="achievements" element={<AchievementsPage />} />
             <Route path="verification/edit/:id" element={<EditVerificationPage />} />
             <Route path="verification" element={<VerificationPage />} />
+            <Route path="notification" element={<AddNotification />} />
             <Route path="support" element={<SupportPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>

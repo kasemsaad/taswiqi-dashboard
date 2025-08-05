@@ -10,6 +10,15 @@ import {
   EditApproval,
   GetApprovalById,
 } from "@/services/userService";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const InfoRequestPage = () => {
   const navigate = useNavigate();
@@ -18,6 +27,7 @@ const InfoRequestPage = () => {
   const [requestData, setRequestData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [reason, setReason] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const fetchRequestData = async (id: string) => {
     try {
@@ -35,7 +45,9 @@ const InfoRequestPage = () => {
     }
   };
 
-  const handleApprove = async () => {
+  const handleApprove = async (e) => {
+      e.preventDefault(); // Add this
+
     try {
       const data = {
         new_status: "approved",
@@ -47,9 +59,8 @@ const InfoRequestPage = () => {
         description: "بنجاح تم الموافقة على الطلب",
         variant: "success",
       });
-      setTimeout(() => {
-        navigate("/verification");
-      }, 1000);
+      // Refresh the data after approval
+      await fetchRequestData(requestData?.id);
     } catch (error) {
       toast({
         title: "خطأ",
@@ -59,7 +70,9 @@ const InfoRequestPage = () => {
     }
   };
 
-  const handleReject = async () => {
+  const handleReject = async (e) => {
+      e.preventDefault(); // Add this
+
     if (!reason) {
       toast({
         title: "خطأ",
@@ -81,9 +94,9 @@ const InfoRequestPage = () => {
         description: "بنجاح تم رفض الطلب",
         variant: "destructive",
       });
-      setTimeout(() => {
-        navigate("/verification");
-      }, 1000);
+      // Close the dialog and refresh the data
+      setIsDialogOpen(false);
+      await fetchRequestData(requestData?.id);
     } catch (error) {
       toast({
         title: "خطأ",
@@ -109,7 +122,7 @@ const InfoRequestPage = () => {
 
   return (
     <div className="container mx-auto p-6 max-w-4xl space-y-6">
-      <div className="flex items-center gap-4 mb-6">
+      <div className="md:flex items-center gap-4 mb-6">
         <Button
           variant="ghost"
           onClick={() => navigate("/verification")}
@@ -121,7 +134,7 @@ const InfoRequestPage = () => {
         <h1 className="text-2xl font-bold">تفاصيل تحقق من الهوية </h1>
       </div>
 
-      <form className="space-y-6">
+      <form className="space-y-6" >
         <Card>
           <CardHeader>
             <CardTitle>معلومات الطلب</CardTitle>
@@ -201,35 +214,58 @@ const InfoRequestPage = () => {
         </Card>
 
         {requestData?.status === "pending" && (
-          <div className="space-y-4">
-            {requestData.status === "pending" && (
-              <div className="space-y-2">
-                <Label htmlFor="reason">سبب الرفض (في حالة الرفض)</Label>
-                <Input
-                  id="reason"
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                  placeholder="أدخل سبب الرفض"
-                />
-              </div>
-            )}
-            
-            <div className="flex justify-end gap-4">
-              <Button
-                type="button"
-                className="bg-red-600 text-white hover:bg-red-700"
-                onClick={handleReject}
-              >
-                رفض الطلب
-              </Button>
-              <Button
-                className="bg-green-600 gap-2 hover:bg-green-700"
-                onClick={handleApprove}
-              >
-                <Save className="w-4 h-4" />
-                الموافقة على الطلب
-              </Button>
-            </div>
+          <div className="flex justify-end gap-4">
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  type="button"
+                  className="bg-red-600 text-white hover:bg-red-700"
+                >
+                  رفض الطلب
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>سبب الرفض</DialogTitle>
+                  <DialogDescription>
+                    الرجاء إدخال سبب رفض هذا الطلب
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="reason">سبب الرفض</Label>
+                    <Input
+                      id="reason"
+                      value={reason}
+                      onChange={(e) => setReason(e.target.value)}
+                      placeholder="أدخل سبب الرفض"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsDialogOpen(false)}
+                  >
+                    إلغاء
+                  </Button>
+                  <Button
+                    className="bg-red-600 text-white hover:bg-red-700"
+                    onClick={handleReject}
+                  >
+                    تأكيد الرفض
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            <Button
+              className="bg-green-600 gap-2 hover:bg-green-700"
+              onClick={handleApprove}
+            >
+              <Save className="w-4 h-4" />
+              الموافقة على الطلب
+            </Button>
           </div>
         )}
       </form>

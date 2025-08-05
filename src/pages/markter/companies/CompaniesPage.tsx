@@ -241,9 +241,9 @@ export default function MarketersPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex items-center justify-between">
+      <div className="md:flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">إدارة الشركات</h1>
+          <h1 className="text-xl md:text-3xl font-bold text-foreground">إدارة الشركات</h1>
           <p className="text-muted-foreground mt-1">
             قائمة بجميع الشركات الشريكة في التطبيق
           </p>

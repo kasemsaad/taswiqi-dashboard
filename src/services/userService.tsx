@@ -155,6 +155,26 @@ export const DeleteApproval = async (
   const response = await Api.delete<UsersServices>(`approval-requests/${id}`);
   return response.data;
 };
+export const Notifications = async (
+  sendData: object
+): Promise<UsersServices> => {
+  const response = await Api.post<UsersServices>(`notifications/push`, sendData);
+  return response.data;
+};
+export const GetAllNotifications = async (params?: GetParams
+): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>(`notifications`, {
+    params,
+  });
+  return response.data;
+};
+export const GetAllCustomersNotMeta = async (params?: GetParams
+): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>(`customers/get-customers-for-dropdown`, {
+    params,
+  });
+  return response.data;
+};
 export const CreateRequest = async (
   sendData: object
 ): Promise<UsersServices> => {

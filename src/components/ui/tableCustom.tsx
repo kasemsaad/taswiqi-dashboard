@@ -120,178 +120,182 @@ export const GeneralTable = ({
 
   return (
     <div className="space-y-4">
-      <div className={`overflow-x-auto ${className}`}>
-        <Table className={rtl ? "rtl-table" : ""}>
-          <TableHeader>
-            <TableRow>
-              {columns.map((column) => (
-                <TableHead key={column.key} className={column.className}>
-                  {column.header}
-                </TableHead>
-              ))}
-              {showActions && actions && <TableHead>الإجراءات</TableHead>}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              Array.from({ length: 5 }).map((_, index) => (
-                <TableRow key={`skeleton-${index}`}>
-                  {columns.map((column) => (
-                    <TableCell key={`${column.key}-${index}`}>
-                      <Skeleton className="h-4 w-[100px]" />
-                    </TableCell>
-                  ))}
-                  {showActions && (
-                    <TableCell>
-                      <Skeleton className="h-4 w-[50px]" />
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))
-            ) : data?.length > 0 ? (
-              data?.map((item) => (
-                <TableRow key={item.id}>
-                  {columns.map((column) => (
-                    <TableCell key={`${column.key}-${item.id}`} className={column.className}>
-                      {column.render ? column.render(item) : item[column.key]}
-                    </TableCell>
-                  ))}
-                  {showActions && actions && (
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          {actions.view && (
-                            <DropdownMenuItem onClick={() => actions.view?.(item)}>
-                              <Eye className="h-4 w-4 ml-2" />
-                              عرض الملف الشخصي
-                            </DropdownMenuItem>
-                          )}
-                          {actions.message && (
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <DropdownMenuItem
-                                  onSelect={(e) => {
-                                    e.preventDefault();
-                                    setSelectedItem(item);
-                                  }}
-                                >
-                                  <MessageSquare className="h-4 w-4 ml-2" />
-                                  إرسال رسالة
-                                </DropdownMenuItem>
-                              </DialogTrigger>
-                              <DialogContent>
-                                <DialogHeader>
-                                  <DialogTitle>إرسال إشعار</DialogTitle>
-                                  <DialogDescription>
-                                    اكتب رسالة الإشعار التي تريد إرسالها إلى {item.name}
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <div className="space-y-4">
-                                  <div>
-                                    <Label htmlFor="notification">نص الإشعار</Label>
-                                    <Textarea
-                                      id="notification"
-                                      placeholder="اكتب رسالة الإشعار هنا..."
-                                      value={notificationMessage}
-                                      onChange={(e) => setNotificationMessage(e.target.value)}
-                                    />
-                                  </div>
-                                  <div>
-                                    <Label htmlFor="image">صورة (اختياري)</Label>
-                                    <div className="flex items-center gap-2">
-                                      <Input
-                                        id="image"
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={(e) =>
-                                          setNotificationImage(e.target.files?.[0] || null)
-                                        }
-                                        className="flex-1"
+      <div className={`relative overflow-x-auto shadow-md sm:rounded-lg ${className}`}>
+        <div className="block w-full overflow-x-auto">
+          <Table className={`w-full ${rtl ? "rtl-table" : ""}`}>
+            <TableHeader>
+              <TableRow>
+                {columns.map((column) => (
+                  <TableHead key={column.key} className={`whitespace-nowrap ${column.className}`}>
+                    {column.header}
+                  </TableHead>
+                ))}
+                {showActions && actions && <TableHead className="whitespace-nowrap">الإجراءات</TableHead>}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {loading ? (
+                Array.from({ length: 5 }).map((_, index) => (
+                  <TableRow key={`skeleton-${index}`}>
+                    {columns.map((column) => (
+                      <TableCell key={`${column.key}-${index}`}>
+                        <Skeleton className="h-4 w-[100px]" />
+                      </TableCell>
+                    ))}
+                    {showActions && (
+                      <TableCell>
+                        <Skeleton className="h-4 w-[50px]" />
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))
+              ) : data?.length > 0 ? (
+                data?.map((item) => (
+                  <TableRow key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-600">
+                    {columns.map((column) => (
+                      <TableCell 
+                        key={`${column.key}-${item.id}`} 
+                        className={`whitespace-nowrap ${column.className}`}
+                      >
+                        {column.render ? column.render(item) : item[column.key]}
+                      </TableCell>
+                    ))}
+                    {showActions && actions && (
+                      <TableCell className="whitespace-nowrap">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {actions.view && (
+                              <DropdownMenuItem onClick={() => actions.view?.(item)}>
+                                <Eye className="h-4 w-4 ml-2" />
+                                عرض الملف الشخصي
+                              </DropdownMenuItem>
+                            )}
+                            {actions.message && (
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <DropdownMenuItem
+                                    onSelect={(e) => {
+                                      e.preventDefault();
+                                      setSelectedItem(item);
+                                    }}
+                                  >
+                                    <MessageSquare className="h-4 w-4 ml-2" />
+                                    إرسال رسالة
+                                  </DropdownMenuItem>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-[425px]">
+                                  <DialogHeader>
+                                    <DialogTitle>إرسال إشعار</DialogTitle>
+                                    <DialogDescription>
+                                      اكتب رسالة الإشعار التي تريد إرسالها إلى {item.name}
+                                    </DialogDescription>
+                                  </DialogHeader>
+                                  <div className="space-y-4">
+                                    <div>
+                                      <Label htmlFor="notification">نص الإشعار</Label>
+                                      <Textarea
+                                        id="notification"
+                                        placeholder="اكتب رسالة الإشعار هنا..."
+                                        value={notificationMessage}
+                                        onChange={(e) => setNotificationMessage(e.target.value)}
                                       />
-                                      <Upload className="h-4 w-4 text-muted-foreground" />
+                                    </div>
+                                    <div>
+                                      <Label htmlFor="image">صورة (اختياري)</Label>
+                                      <div className="flex items-center gap-2">
+                                        <Input
+                                          id="image"
+                                          type="file"
+                                          accept="image/*"
+                                          onChange={(e) =>
+                                            setNotificationImage(e.target.files?.[0] || null)
+                                          }
+                                          className="flex-1"
+                                        />
+                                        <Upload className="h-4 w-4 text-muted-foreground" />
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
-                                <DialogFooter>
-                                  <Button onClick={handleSendNotification}>إرسال الإشعار</Button>
-                                </DialogFooter>
-                              </DialogContent>
-                            </Dialog>
-                          )}
-                          {actions.block && (
-                            <Dialog
-                              open={isBlockDialogOpen}
-                              onOpenChange={setIsBlockDialogOpen}
-                            >
-                              <DialogTrigger asChild>
-                                <DropdownMenuItem
-                                  className="text-destructive"
-                                  onSelect={(e) => {
-                                    e.preventDefault();
-                                    setSelectedItem(item);
-                                    setIsBlockDialogOpen(true);
-                                  }}
-                                >
-                                  <Ban className="h-4 w-4 ml-2" />
-                                  إيقاف الحساب
-                                </DropdownMenuItem>
-                              </DialogTrigger>
-                              <DialogContent>
-                                <DialogHeader>
-                                  <DialogTitle>تأكيد حظر الحساب</DialogTitle>
-                                  <DialogDescription>
-                                    هل أنت متأكد من أنك تريد حظر حساب {item.name}؟ هذا الإجراء سيمنع
-                                    المستخدم من الوصول إلى حسابه.
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <DialogFooter>
-                                  <Button
-                                    variant="outline"
-                                    onClick={() => setIsBlockDialogOpen(false)}
+                                  <DialogFooter>
+                                    <Button onClick={handleSendNotification}>إرسال الإشعار</Button>
+                                  </DialogFooter>
+                                </DialogContent>
+                              </Dialog>
+                            )}
+                            {actions.block && (
+                              <Dialog
+                                open={isBlockDialogOpen}
+                                onOpenChange={setIsBlockDialogOpen}
+                              >
+                                <DialogTrigger asChild>
+                                  <DropdownMenuItem
+                                    className="text-destructive"
+                                    onSelect={(e) => {
+                                      e.preventDefault();
+                                      setSelectedItem(item);
+                                      setIsBlockDialogOpen(true);
+                                    }}
                                   >
-                                    إلغاء
-                                  </Button>
-                                  <Button
-                                    variant="destructive"
-                                    onClick={handleBlockAccount}
-                                  >
-                                    تأكيد الحظر
-                                  </Button>
-                                </DialogFooter>
-                              </DialogContent>
-                            </Dialog>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  )}
+                                    <Ban className="h-4 w-4 ml-2" />
+                                    إيقاف الحساب
+                                  </DropdownMenuItem>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-[425px]">
+                                  <DialogHeader>
+                                    <DialogTitle>تأكيد حظر الحساب</DialogTitle>
+                                    <DialogDescription>
+                                      هل أنت متأكد من أنك تريد حظر حساب {item.name}؟ هذا الإجراء سيمنع
+                                      المستخدم من الوصول إلى حسابه.
+                                    </DialogDescription>
+                                  </DialogHeader>
+                                  <DialogFooter>
+                                    <Button
+                                      variant="outline"
+                                      onClick={() => setIsBlockDialogOpen(false)}
+                                    >
+                                      إلغاء
+                                    </Button>
+                                    <Button
+                                      variant="destructive"
+                                      onClick={handleBlockAccount}
+                                    >
+                                      تأكيد الحظر
+                                    </Button>
+                                  </DialogFooter>
+                                </DialogContent>
+                              </Dialog>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={columns.length + (showActions ? 1 : 0)} className="text-center">
+                    لا توجد بيانات متاحة
+                  </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length + (showActions ? 1 : 0)} className="text-center">
-                  لا توجد بيانات متاحة
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
-          
       {pagination && (
-        <div className="flex flex-col px-5 sm:flex-row items-center justify-between gap-4 py-2">
-          <div className="text-sm text-muted-foreground">
+        <div className="flex flex-col px-2 sm:px-5 sm:flex-row items-center justify-between gap-4 py-2">
+          <div className="text-sm text-muted-foreground whitespace-nowrap">
             عرض {startItem}-{endItem} من {pagination.total} عنصر
           </div>
-          <div className="flex items-center gap-4 px-5 py-2">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">عناصر لكل صفحة:</span>
+          <div className="flex flex-col sm:flex-row items-center gap-4 px-2 sm:px-5 py-2 w-full sm:w-auto">
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
+              <span className="text-sm text-muted-foreground whitespace-nowrap">عناصر لكل صفحة:</span>
               <Select
                 value={pagination.perPage.toString()}
                 onValueChange={(value) => pagination.onPerPageChange(Number(value))}
@@ -309,33 +313,36 @@ export const GeneralTable = ({
               </Select>
             </div>
 
-            <div className="flex items-center gap-2 ">
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => pagination.onPageChange(pagination.page - 1)}
                 disabled={pagination.page <= 1}
+                className="h-8 w-8 p-0"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
               
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 flex-wrap justify-center">
                 {pagination.page > 2 && (
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => pagination.onPageChange(1)}
+                    className="h-8 w-8 p-0 hidden sm:inline-flex"
                   >
                     1
                   </Button>
                 )}
-                {pagination.page > 3 && <span className="px-2">...</span>}
+                {pagination.page > 3 && <span className="px-2 hidden sm:block">...</span>}
                 
                 {pagination.page > 1 && (
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => pagination.onPageChange(pagination.page - 1)}
+                    className="h-8 w-8 p-0"
                   >
                     {pagination.page - 1}
                   </Button>
@@ -344,7 +351,7 @@ export const GeneralTable = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-primary"
+                  className="border-primary h-8 w-8 p-0"
                 >
                   {pagination.page}
                 </Button>
@@ -354,17 +361,19 @@ export const GeneralTable = ({
                     variant="ghost"
                     size="sm"
                     onClick={() => pagination.onPageChange(pagination.page + 1)}
+                    className="h-8 w-8 p-0"
                   >
                     {pagination.page + 1}
                   </Button>
                 )}
                 
-                {pagination.page < totalPages - 2 && <span className="px-2">...</span>}
+                {pagination.page < totalPages - 2 && <span className="px-2 hidden sm:block">...</span>}
                 {pagination.page < totalPages - 1 && (
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => pagination.onPageChange(totalPages)}
+                    className="h-8 w-8 p-0 hidden sm:inline-flex"
                   >
                     {totalPages}
                   </Button>
@@ -376,6 +385,7 @@ export const GeneralTable = ({
                 size="sm"
                 onClick={() => pagination.onPageChange(pagination.page + 1)}
                 disabled={pagination.page >= totalPages}
+                className="h-8 w-8 p-0"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>

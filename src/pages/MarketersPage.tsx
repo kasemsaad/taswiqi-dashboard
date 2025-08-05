@@ -183,9 +183,9 @@ export default function MarketersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="md:flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">إدارة المسوقين</h1>
+          <h1 className="text-xl md:text-3xl font-bold text-foreground">إدارة المسوقين</h1>
           <p className="text-muted-foreground mt-1">
             قائمة بجميع المسوقين المسجلين في التطبيق
           </p>

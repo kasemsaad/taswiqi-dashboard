@@ -87,7 +87,7 @@ const InfoRequestPage = () => {
 
   return (
     <div className="container mx-auto p-6 max-w-4xl space-y-6">
-      <div className="flex items-center gap-4 mb-6">
+      <div className="md:flex items-center gap-4 mb-6">
         <Button
           variant="ghost"
           onClick={() => navigate("/requsetWithdrawal")}

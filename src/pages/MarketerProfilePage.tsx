@@ -423,7 +423,7 @@ export default function MarketerProfilePage() {
       header: "ملف الشركة",
       render: (Referral) => (
         <div className="font-medium ps-5">
-          <a href={`/companies/${Referral.id}`}>
+          <a href={`companies/edit/${Referral.id}`}>
             <img src={company} alt="company" />
           </a>
         </div>
@@ -848,8 +848,8 @@ export default function MarketerProfilePage() {
       </div>
 
       {/* Detailed Information Tabs */}
-      <Tabs defaultValue="info" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-8" dir="rtl">
+      <Tabs defaultValue="info" dir="rtl" className="relative">
+  <TabsList className="flex w-full overflow-x-auto py-2 space-x-reverse space-x-2">
           <TabsTrigger value="info">المعلومات الشخصية</TabsTrigger>
           <TabsTrigger
             value="codes"

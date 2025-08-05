@@ -401,12 +401,12 @@ export default function MarketersPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex items-center justify-between">
+      <div className="md:flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">الروابط و الأكواد</h1>
+          <h1 className="text-xl md:text-3xl font-bold text-foreground">الروابط و الأكواد</h1>
           <p className="text-muted-foreground mt-1">قائمة بجميع الروابط و الأكواد</p>
         </div>
-      
+      <div className="">
         {activeTab === "links" ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -443,7 +443,7 @@ export default function MarketersPage() {
           </DropdownMenu>
         )}
       </div>
-
+ </div>
       {/* Stats Summary */}
       {activeTab === "links" ? (
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
@@ -575,20 +575,25 @@ export default function MarketersPage() {
 
       {/* Tabs for switching between tables */}
       <Tabs value={activeTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-8" dir="rtl">
-          <TabsTrigger
-            value="links"
-            onClick={() => setActiveTab("links")}
-          >
-            روابط الإحالة
-          </TabsTrigger>
-          <TabsTrigger
-            value="codes"
-            onClick={() => setActiveTab("codes")}
-          >
-            أكواد الخصم
-          </TabsTrigger>
-        </TabsList>
+   <TabsList 
+  className="flex w-full flex-wrap justify-end" // justify-end for RTL
+  dir="rtl"
+>
+  <TabsTrigger 
+    value="links" 
+    onClick={() => setActiveTab("links")}
+    className="flex-1 min-w-[120px] text-center"
+  >
+    روابط الإحالة
+  </TabsTrigger>
+  <TabsTrigger 
+    value="codes" 
+    onClick={() => setActiveTab("codes")}
+    className="flex-1 min-w-[120px] text-center"
+  >
+    أكواد الخصم
+  </TabsTrigger>
+</TabsList>
         
         {/* Referral Links Table */}
         <TabsContent value="links" className="space-y-4" dir="rtl">
