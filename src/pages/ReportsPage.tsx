@@ -1,6 +1,7 @@
+import { useEffect, useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { GetAllReports } from "@/services/userService";
 import {
   Select,
   SelectContent,
@@ -14,220 +15,252 @@ import {
   Users,
   Building,
   Banknote,
-  ShoppingBag,
-  Calendar,
-  Download
+  Loader2
 } from "lucide-react";
 
-const statsCards = [
-  {
-    title: "إجمالي العمولات المدفوعة",
-    value: "245,680",
-    unit: "ريال",
-    change: "+12.5%",
-    changeType: "increase",
-    icon: Banknote,
-    gradient: "gradient-success"
-  },
-  {
-    title: "أكواد الخصم المستخدمة",
-    value: "1,847",
-    unit: "كود",
-    change: "+8.2%",
-    changeType: "increase", 
-    icon: ShoppingBag,
-    gradient: "gradient-warning"
-  },
-  {
-    title: "المسوقين النشطين",
-    value: "342",
-    unit: "مسوق",
-    change: "+15.3%",
-    changeType: "increase",
-    icon: Users,
-    gradient: "gradient-primary"
-  },
-  {
-    title: "الشركات المشاركة",
-    value: "89",
-    unit: "شركة",
-    change: "+5.1%",
-    changeType: "increase",
-    icon: Building,
-    gradient: "gradient-primary"
-  }
-];
-
-const recentTransactions = [
-  {
-    id: 1,
-    marketer: "أحمد محمد العلي",
-    company: "متجر الأزياء الراقية",
-    commission: "1,250 ريال",
-    date: "منذ ساعة",
-    status: "مكتملة"
-  },
-  {
-    id: 2,
-    marketer: "فاطمة خالد السعد",
-    company: "إلكترونيات المستقبل",
-    commission: "890 ريال",
-    date: "منذ 3 ساعات",
-    status: "قيد المراجعة"
-  },
-  {
-    id: 3,
-    marketer: "عبدالله صالح القحطاني",
-    company: "مطعم الذوق الأصيل",
-    commission: "450 ريال",
-    date: "منذ 5 ساعات",
-    status: "مكتملة"
-  },
-  {
-    id: 4,
-    marketer: "نورا عبدالرحمن",
-    company: "صيدلية الشفاء",
-    commission: "320 ريال",
-    date: "اليوم",
-    status: "مكتملة"
-  }
-];
-
-const topMarketers = [
-  { name: "أحمد محمد العلي", sales: "89,450 ريال", orders: 156, rank: 1 },
-  { name: "فاطمة خالد السعد", sales: "67,890 ريال", orders: 134, rank: 2 },
-  { name: "عبدالله صالح القحطاني", sales: "54,320 ريال", orders: 98, rank: 3 },
-  { name: "نورا عبدالرحمن", sales: "45,670 ريال", orders: 87, rank: 4 },
-  { name: "محمد أحمد الشهري", sales: "42,100 ريال", orders: 76, rank: 5 }
-];
-
 export default function ReportsPage() {
+  const [reportData, setReportData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [timeFilter, setTimeFilter] = useState("this_week"); // ✅ الفلتر الافتراضي
+
+  // ✅ النصوص المقابلة لكل فلتر
+  const filterTextMap: Record<string, string> = {
+    today: "من اليوم",
+    this_week: "من الأسبوع الماضي",
+    this_month: "من الشهر الماضي",
+    this_year: "من السنة الماضية"
+  };
+
+  const filterLabel = useMemo(() => filterTextMap[timeFilter] || "", [timeFilter]);
+
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        setLoading(true);
+        const response = await GetAllReports({
+          filter: timeFilter // ✅ API يستقبل القيمة الصحيحة
+        });
+        if (response.status) {
+          setReportData(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching reports:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReports();
+  }, [timeFilter]);
+
+  if (loading && !reportData) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!reportData) {
+    return <div className="text-center py-10">No report data available</div>;
+  }
+
+  const statsCards = [
+    {
+      title: "إجمالي المسوقيين",
+      value: reportData.totalCustomers?.number || 0,
+      unit: "مسوق",
+      change: reportData.totalCustomers?.change || 0,
+      changeType: (reportData.totalCustomers?.change || 0) >= 0 ? "increase" : "decrease",
+      icon: Users,
+      gradient: "bg-gradient-to-r from-blue-500 to-blue-600"
+    },
+    {
+      title: "المسوقيين النشطين",
+      value: reportData.activeCustomers?.number || 0,
+      unit: "مسوق",
+      change: reportData.activeCustomers?.change || 0,
+      changeType: (reportData.activeCustomers?.change || 0) >= 0 ? "increase" : "decrease",
+      icon: Users,
+      gradient: "bg-gradient-to-r from-green-500 to-green-600"
+    },
+    {
+      title: "إجمالي الأرباح",
+      value: reportData.totalEarnings?.number || 0,
+      unit: "ريال",
+      change: reportData.totalEarnings?.change || 0,
+      changeType: (reportData.totalEarnings?.change || 0) >= 0 ? "increase" : "decrease",
+      icon: Banknote,
+      gradient: "bg-gradient-to-r from-yellow-500 to-yellow-600"
+    },
+    {
+      title: "الشركات المشاركة",
+      value: reportData.totalBrands?.number || 0,
+      unit: "شركة",
+      change: reportData.totalBrands?.change || 0,
+      changeType: (reportData.totalBrands?.change || 0) >= 0 ? "increase" : "decrease",
+      icon: Building,
+      gradient: "bg-gradient-to-r from-purple-500 to-purple-600"
+    }
+  ];
+
+  // const handleExport = () => {
+  //   console.log("Exporting report with filters:", { timeFilter });
+  // };
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">التقارير والإحصائيات</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">التقارير والإحصائيات</h1>
           <p className="text-muted-foreground mt-1">نظرة شاملة على أداء تطبيق تسويقي</p>
         </div>
-        <div className="flex items-center gap-3">
-          <Select defaultValue="week">
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="today">اليوم</SelectItem>
-              <SelectItem value="week">هذا الأسبوع</SelectItem>
-              <SelectItem value="month">هذا الشهر</SelectItem>
-              <SelectItem value="year">هذا العام</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button variant="outline">
-            <Download className="h-4 w-4 ml-2" />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+          <div className="flex gap-3 w-full sm:w-auto">
+            <Select value={timeFilter} onValueChange={setTimeFilter}>
+              <SelectTrigger className="w-full sm:w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="today">اليوم</SelectItem>
+                <SelectItem value="this_week">هذا الأسبوع</SelectItem>
+                <SelectItem value="this_month">هذا الشهر</SelectItem>
+                <SelectItem value="this_year">هذا العام</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* <Button 
+            variant="outline" 
+            onClick={handleExport}
+            disabled={loading}
+            className="w-full sm:w-auto"
+          >
+            {loading ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : (
+              <Download className="h-4 w-4 mr-2" />
+            )}
             تصدير التقرير
-          </Button>
+          </Button> */}
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {statsCards.map((stat, index) => (
-          <Card key={index} className="dashboard-card">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {stat.title}
-              </CardTitle>
-              <div className={`p-2 rounded-lg ${stat.gradient}`}>
-                <stat.icon className="h-4 w-4 text-white" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-baseline gap-2">
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <span className="text-sm text-muted-foreground">{stat.unit}</span>
-              </div>
-              <div className="flex items-center gap-1 mt-2">
-                {stat.changeType === "increase" ? (
-                  <TrendingUp className="h-4 w-4 text-success" />
-                ) : (
-                  <TrendingDown className="h-4 w-4 text-destructive" />
-                )}
-                <span className={`text-sm font-medium ${
-                  stat.changeType === "increase" ? "text-success" : "text-destructive"
-                }`}>
-                  {stat.change}
-                </span>
-                <span className="text-sm text-muted-foreground">من الشهر الماضي</span>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {loading ? (
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      ) : (
+        <>
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {statsCards.map((stat, index) => (
+              <Card key={index} className="dashboard-card">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    {stat.title}
+                  </CardTitle>
+                  <div className={`p-2 rounded-lg ${stat.gradient}`}>
+                    <stat.icon className="h-4 w-4 text-white" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-baseline gap-2">
+                    <div className="text-2xl font-bold">{stat.value}</div>
+                    <span className="text-sm text-muted-foreground">{stat.unit}</span>
+                  </div>
+                  <div className="flex items-center gap-1 mt-2">
+                    {stat.changeType === "increase" ? (
+                      <TrendingUp className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <TrendingDown className="h-4 w-4 text-red-500" />
+                    )}
+                    <span className={`text-sm font-medium ${
+                      stat.changeType === "increase" ? "text-green-500" : "text-red-500"
+                    }`}>
+                      {Math.abs(stat.change)}%
+                    </span>
+                    <span className="text-sm text-muted-foreground">{filterLabel}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Transactions */}
-        <Card className="dashboard-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              المعاملات الأخيرة
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentTransactions.map((transaction) => (
-                <div key={transaction.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                  <div className="space-y-1">
-                    <p className="font-medium">{transaction.marketer}</p>
-                    <p className="text-sm text-muted-foreground">{transaction.company}</p>
-                    <p className="text-xs text-muted-foreground">{transaction.date}</p>
-                  </div>
-                  <div className="text-left space-y-1">
-                    <p className="font-bold text-success">{transaction.commission}</p>
-                    <Badge 
-                      className={transaction.status === "مكتملة" ? "status-active" : "status-pending"}
-                    >
-                      {transaction.status}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Top Marketers */}
-        <Card className="dashboard-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              أفضل المسوقين
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {topMarketers.map((marketer) => (
-                <div key={marketer.rank} className="flex items-center gap-4">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white ${
-                    marketer.rank === 1 ? 'bg-yellow-500' :
-                    marketer.rank === 2 ? 'bg-gray-400' :
-                    marketer.rank === 3 ? 'bg-amber-600' : 'bg-primary'
-                  }`}>
-                    {marketer.rank}
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium">{marketer.name}</p>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span>المبيعات: {marketer.sales}</span>
-                      <span>الطلبات: {marketer.orders}</span>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Top Customers */}
+            <Card className="dashboard-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  أفضل مسوقيين
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {reportData.topCustomers?.map((customer: any, index: number) => (
+                    <div key={index} className="flex items-center gap-4 p-2 hover:bg-muted/50 rounded-lg transition-colors">
+                      <div className="w-10 h-10 rounded-full overflow-hidden bg-muted">
+                        {customer.image && customer.image !== "default.png" ? (
+                          <img 
+                            src={customer.image} 
+                            alt={customer.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-primary text-white">
+                            {customer.name?.charAt(0) || "?"}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium">{customer.name || "غير معروف"}</p>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span>العملاء: {customer.total_clients || 0}</span>
+                          <span>الأرباح: {customer.total_earnings || 0} ريال</span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+              </CardContent>
+            </Card>
+
+            {/* Last Withdraw Requests */}
+            <Card className="dashboard-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Banknote className="h-5 w-5" />
+                  آخر طلبات السحب
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {reportData.lastWithdrawRequests?.map((request: any, index: number) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                      <div className="space-y-1">
+                        <p className="font-medium">{request.name || "غير معروف"}</p>
+                        <p className="text-sm text-muted-foreground">{request.email || "بريد غير معروف"}</p>
+                        <p className="text-xs text-muted-foreground">{request.created_at || "تاريخ غير معروف"}</p>
+                      </div>
+                      <div className="text-left space-y-1">
+                        <p className="font-bold">{request.amount || 0} ريال</p>
+                        <Badge 
+                          variant={request.status === "pending" ? "secondary" : "default"}
+                          className={request.status === "pending" ? "bg-yellow-100 text-yellow-800" : "bg-green-100 text-green-800"}
+                        >
+                          {request.status === "pending" ? "قيد الانتظار" : "مكتمل"}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </>
+      )}
     </div>
   );
 }

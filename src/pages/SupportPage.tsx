@@ -1,233 +1,476 @@
-import { useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+// import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
   HeadphonesIcon, 
   Send, 
   MessageSquare, 
   Clock, 
-  CheckCircle,
-  XCircle,
-  Pause,
-  StickyNote
+  // CheckCircle,
+  // XCircle,
+  // Pause,
+  StickyNote,
+  Loader2,
+  Trash2,
+  MoreHorizontal
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { messaging, onMessage } from "@/hooks/firebase copy";
+import { toast } from "sonner";
+import { GetMesaages, Getchats, SendMessage, deleteMessage, deleteChate } from "@/services/userService";
 
-const supportTickets = [
-  {
-    id: 1,
-    marketerName: "أحمد محمد العالي",
-    subject: "دعم",
-    lastMessage: "لدي مشكلة في الرصيد",
-    timestamp: "منذ دقيقتين",
-    status: "مفتوحة",
-    unread: true
-  },
-  {
-    id: 2,
-    marketerName: "سارة أحمد الزهراني",
-    subject: "شكوى",
-    lastMessage: "لم أحصل على عمولتي",
-    timestamp: "منذ ساعة",
-    status: "معلقة",
-    unread: false
-  },
-  {
-    id: 3,
-    marketerName: "محمد علي القحطاني",
-    subject: "استفسار",
-    lastMessage: "كيف أحدث بياناتي؟",
-    timestamp: "أمس",
-    status: "مكتملة",
-    unread: false
-  },
-  {
-    id: 4,
-    marketerName: "فاطمة عبدالله النجار",
-    subject: "دعم تقني",
-    lastMessage: "التطبيق لا يعمل بشكل صحيح",
-    timestamp: "2024-01-15",
-    status: "مغلقة",
-    unread: false
-  }
-];
+interface Chat {
+  user: {
+    id: number;
+    name: string;
+    email: string;
+    image: string;
+  };
+  last_message: {
+    id: number;
+    message: string;
+    is_mine: boolean;
+    created_since: string;
+    is_read: boolean;
+  };
+}
 
-const chatMessages = [
-  {
-    id: 1,
-    sender: "system",
-    content: "سبب التواصل: دعم",
-    timestamp: "اليوم 02:30 ص",
-    isOld: false
-  },
-  {
-    id: 2,
-    sender: "marketer",
-    content: "السلام عليكم، لدي مشكلة في الرصيد. الرصيد لا يظهر بشكل صحيح في حسابي",
-    timestamp: "اليوم 02:32 ص",
-    isOld: false
-  },
-  {
-    id: 3,
-    sender: "internal_note",
-    content: "العميل لديه مشكلة في الرصيد، يجب مراجعة الحساب",
-    timestamp: "اليوم 02:33 ص",
-    isOld: false
-  },
-  {
-    id: 4,
-    sender: "admin",
-    content: "وعليكم السلام، سوف أقوم بمراجعة حسابك الآن",
-    timestamp: "اليوم 02:35 ص",
-    isOld: false
-  },
-  {
-    id: 5,
-    sender: "marketer",
-    content: "شكرًا لكم",
-    timestamp: "اليوم 02:36 ص",
-    isOld: false
-  }
-];
+interface Message {
+  id: number;
+  message: string;
+  is_mine: boolean;
+  created_since: string;
+  is_read: boolean;
+  is_note?: boolean;
+  isPending?: boolean;
+  isFailed?: boolean;
+}
 
-const statusColors = {
-  "مفتوحة": "bg-green-500/10 text-green-700 border-green-200",
-  "معلقة": "bg-yellow-500/10 text-yellow-700 border-yellow-200",
-  "مكتملة": "bg-blue-500/10 text-blue-700 border-blue-200",
-  "مغلقة": "bg-gray-500/10 text-gray-700 border-gray-200"
-};
+// interface MessagesResponse {
+//   status: boolean;
+//   code: number;
+//   message: string;
+//   data: Message[];
+//   meta: {
+//     total: number;
+//     current_page: number;
+//     per_page: number;
+//     last_page: number;
+//   };
+// }
 
-const statusIcons = {
-  "مفتوحة": CheckCircle,
-  "معلقة": Pause,
-  "مكتملة": CheckCircle,
-  "مغلقة": XCircle
-};
+// const statusColors = {
+//   "مفتوحة": "bg-green-500/10 text-green-700 border-green-200",
+//   "معلقة": "bg-yellow-500/10 text-yellow-700 border-yellow-200",
+//   "مكتملة": "bg-blue-500/10 text-blue-700 border-blue-200",
+//   "مغلقة": "bg-gray-500/10 text-gray-700 border-gray-200"
+// };
+
+// const statusIcons = {
+//   "مفتوحة": CheckCircle,
+//   "معلقة": Pause,
+//   "مكتملة": CheckCircle,
+//   "مغلقة": XCircle
+// };
 
 export default function SupportPage() {
-  const [selectedTicket, setSelectedTicket] = useState<number | null>(null);
+  const [selectedChat, setSelectedChat] = useState<number | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [newNote, setNewNote] = useState("");
   const [showNoteInput, setShowNoteInput] = useState(false);
-  const [currentStatus, setCurrentStatus] = useState("مفتوحة");
+  // const [currentStatus, setCurrentStatus] = useState("مفتوحة");
+  const [chats, setChats] = useState<Chat[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isSending, setIsSending] = useState(false);
+  // const [pollingInterval, setPollingInterval] = useState<NodeJS.Timeout | null>(null);
+  const [selectedMessageId, setSelectedMessageId] = useState<number | null>(null);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    perPage: 10,
+    total: 0,
+    lastPage: 1,
+    hasMore: false
+  });
+  const [displayedMessageCount, setDisplayedMessageCount] = useState(10);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const selectedTicketData = supportTickets.find(ticket => ticket.id === selectedTicket);
+  const selectedChatData = chats.find(chat => chat.user.id === selectedChat);
 
-  const handleSendMessage = () => {
-    if (newMessage.trim()) {
-      // هنا يتم إرسال الرسالة
-      setNewMessage("");
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || !selectedChat || isSending) return;
+
+    setIsSending(true);
+    
+    const tempMsg: Message = {
+      id: Date.now(),
+      message: newMessage,
+      is_mine: true,
+      created_since: "جاري الإرسال...",
+      is_read: false,
+      isPending: true
+    };
+    
+    setMessages(prev => [...prev, tempMsg]);
+    setNewMessage("");
+    
+    try {
+      const response = await SendMessage({
+        customer_id: selectedChat,
+        message: newMessage
+      });
+      
+      if (response.status && response.data) {
+        setMessages(prev => 
+          prev.map(msg => 
+            msg.id === tempMsg.id 
+              ? { 
+                  ...(response.data as Message), 
+                  is_mine: true,
+                  created_since: "الآن" 
+                }
+              : msg
+          )
+        );
+        
+        await fetchMessages(selectedChat.toString(), 1);
+        await fetchChats();
+      } else {
+        throw new Error(response.message || "Failed to send message");
+      }
+    } catch (error: any) {
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === tempMsg.id 
+            ? { 
+                ...msg, 
+                created_since: "فشل الإرسال", 
+                isFailed: true 
+              }
+            : msg
+        )
+      );
+      toast.error("فشل إرسال الرسالة: " + (error.message || "حدث خطأ"));
+    } finally {
+      setIsSending(false);
+      scrollToBottom();
     }
   };
 
-  const handleSendNote = () => {
-    if (newNote.trim()) {
-      // هنا يتم إرسال الملاحظة الداخلية
-      setNewNote("");
-      setShowNoteInput(false);
+  const handleSendNote = async () => {
+    if (!newNote.trim() || !selectedChat || isSending) return;
+
+    setIsSending(true);
+    
+    const tempNote: Message = {
+      id: Date.now(),
+      message: newNote,
+      is_mine: false,
+      created_since: "جاري الإرسال...",
+      is_read: true,
+      is_note: true,
+      isPending: true
+    };
+    
+    setMessages(prev => [...prev, tempNote]);
+    setNewNote("");
+    setShowNoteInput(false);
+    
+    try {
+      const response = await SendMessage({
+        customer_id: selectedChat,
+        message: newNote,
+        is_note: true
+      });
+      
+      if (response.status && response.data) {
+        setMessages(prev => 
+          prev.map(msg => 
+            msg.id === tempNote.id 
+              ? { 
+                  ...(response.data as Message), 
+                  is_note: true,
+                  created_since: "الآن"
+                }
+              : msg
+          )
+        );
+      } else {
+        throw new Error(response.message || "Failed to send note");
+      }
+    } catch (error: any) {
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === tempNote.id 
+            ? { 
+                ...msg, 
+                created_since: "فشل الإرسال", 
+                isFailed: true 
+              }
+            : msg
+        )
+      );
+      toast.error("فشل إرسال الملاحظة: " + (error.message || "حدث خطأ"));
+    } finally {
+      setIsSending(false);
+      scrollToBottom();
     }
   };
 
-  const handleStatusChange = (newStatus: string) => {
-    setCurrentStatus(newStatus);
-    // هنا يتم تحديث الحالة في قاعدة البيانات
+  // const handleStatusChange = (newStatus: string) => {
+  //   setCurrentStatus(newStatus);
+  // };
+
+  const fetchChats = async () => {
+    try {
+      const response = await Getchats();
+      if (Array.isArray(response.data)) {
+        setChats(response.data.sort((a, b) => b.last_message.id - a.last_message.id));
+      } else {
+        setChats([]);
+      }
+    } catch (error) {
+      console.error("Error fetching chats:", error);
+      toast.error("فشل تحميل المحادثات");
+    }
   };
 
-  if (selectedTicket) {
+ // ... (بقية الواردات تبقى كما هي)
+
+const fetchMessages = async (userId: string, page: number = 1) => {
+  try {
+    const response = await GetMesaages(userId, { per_page: 10, page });
+    if (response && response.status && Array.isArray(response.data)) {
+      if (page === 1) {
+        // الصفحة الأولى - نعرض أحدث الرسائل
+        setMessages(response.data);
+        setDisplayedMessageCount(response.data.length);
+      } else {
+        // الصفحات التالية - نضيف الرسائل الأقدم في الأعلى
+        if (Array.isArray(response.data)) {
+          const messagesArray = response.data as typeof messages;
+          setMessages(prev => [...messagesArray, ...prev]);
+          setDisplayedMessageCount(prev => prev + messagesArray.length);
+        } else {
+          // إذا لم تكن البيانات مصفوفة، لا تقم بتغيير الرسائل أو العدد
+        }
+      }
+      
+      if (response.meta) {
+        setPagination({
+          currentPage: response.meta.current_page,
+          perPage: response.meta.per_page,
+          total: response.meta.total,
+          lastPage: response.meta.last_page,
+          hasMore: response.meta.current_page < response.meta.last_page
+        });
+      }
+      
+      if (page === 1) {
+        setTimeout(scrollToBottom, 100);
+      }
+    } else {
+      setMessages([]);
+      setDisplayedMessageCount(0);
+    }
+  } catch (error) {
+    console.error("Error fetching messages:", error);
+    toast.error("فشل تحميل الرسائل");
+  }
+};
+
+// ... (بقية الكود يبقى كما هو)
+
+  const handleDeleteMessage = async (messageId: string) => {
+    try {
+      const response = await deleteMessage(messageId.toString());
+      if (response.status) {
+        toast.success("تم حذف الرسالة بنجاح");
+        setMessages(prev => prev.filter(msg => msg.id.toString() !== messageId));
+        setDisplayedMessageCount(prev => prev - 1);
+      } else {
+        throw new Error(response.message || "Failed to delete message");
+      }
+    } catch (error: any) {
+      toast.error("فشل حذف الرسالة: " + (error.message || "حدث خطأ"));
+    }
+  };
+
+  const handleDeleteChat = async () => {
+    if (!selectedChat) return;
+    
+    try {
+      const response = await deleteChate(selectedChat.toString());
+      if (response.status) {
+        toast.success("تم حذف المحادثة بنجاح");
+        setSelectedChat(null);
+        fetchChats();
+      } else {
+        throw new Error(response.message || "Failed to delete chat");
+      }
+    } catch (error: any) {
+      toast.error("فشل حذف المحادثة: " + (error.message || "حدث خطأ"));
+    }
+  };
+
+  const handleLoadMoreMessages = () => {
+    const nextPage = pagination.currentPage + 1;
+    if (selectedChat) {
+      fetchMessages(selectedChat.toString(), nextPage);
+    }
+  };
+
+  useEffect(() => {
+    fetchChats();
+    
+    const unsubscribe = onMessage(messaging, (payload) => {
+      console.log("New message notification:", payload);
+      const { title, body } = payload.notification ?? {};
+      toast(`${title}\n${body}`);
+      fetchChats();
+      if (selectedChat) fetchMessages(selectedChat.toString(), 1);
+    });
+
+    return () => unsubscribe();
+  }, [selectedChat]);
+
+  useEffect(() => {
+    if (selectedChat) {
+      // if (pollingInterval) clearInterval(pollingInterval);
+      fetchMessages(selectedChat.toString(), 1);
+      fetchChats();
+    }
+  }, [selectedChat]);
+
+  useEffect(() => {
+    if (pagination.currentPage === 1) {
+      scrollToBottom();
+    }
+  }, [messages]);
+
+  const renderMessage = (message: Message) => (
+    <div 
+      className={cn(
+        "max-w-xs lg:max-w-md px-4 py-2 rounded-lg relative group",
+        message.is_note 
+          ? "bg-orange-100 border-l-4 border-orange-500 text-orange-800 w-full max-w-none"
+          : message.is_mine
+          ? "bg-primary text-primary-foreground"
+          : "bg-muted",
+        message.isPending && "opacity-75",
+        message.isFailed && "bg-red-100 text-red-800"
+      )}
+      onMouseEnter={() => setSelectedMessageId(message.id)}
+      onMouseLeave={() => setSelectedMessageId(null)}
+    >
+      {message.is_note && (
+        <div className="flex items-center gap-2 mb-1">
+          <StickyNote className="h-4 w-4" />
+          <span className="text-xs font-medium">ملاحظة للفريق الداخلي</span>
+        </div>
+      )}
+      <p className="text-sm">{message.message}</p>
+      <div className="flex justify-between items-center">
+        <p className={cn(
+          "text-xs mt-1",
+          message.is_note 
+            ? "text-orange-600" 
+            : message.is_mine 
+            ? "text-primary-foreground/70" 
+            : "text-muted-foreground",
+          message.isFailed && "text-red-600"
+        )}>
+          {message.created_since}
+          {message.isPending && " ⏳"}
+          {message.isFailed && " ❌"}
+        </p>
+        {selectedMessageId === message.id  && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-6 w-6 p-0 opacity-70 hover:opacity-100 hover:bg-red-100/50 hover:text-red-600"
+            onClick={() => handleDeleteMessage(message.id.toString())}
+          >
+            <Trash2 className="h-3 w-3" />
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+
+  if (selectedChat) {
     return (
       <div className="h-[calc(100vh-8rem)] flex flex-col">
-        {/* Header */}
         <div className="bg-card border-b p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button 
                 variant="ghost" 
-                onClick={() => setSelectedTicket(null)}
+                onClick={() => setSelectedChat(null)}
                 className="p-2"
               >
                 ←
               </Button>
               <Avatar>
+                <AvatarImage src={selectedChatData?.user.image} />
                 <AvatarFallback>
-                  {selectedTicketData?.marketerName.split(' ')[0][0]}
+                  {selectedChatData?.user.name.split(' ')[0][0]}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <h3 className="font-semibold">{selectedTicketData?.marketerName}</h3>
-                <p className="text-sm text-muted-foreground">مسوق</p>
+                <h3 className="font-semibold">{selectedChatData?.user.name}</h3>
+                <p className="text-sm text-muted-foreground">{selectedChatData?.user.email}</p>
               </div>
             </div>
             
             <div className="flex items-center gap-2">
-              <Badge className={statusColors[currentStatus as keyof typeof statusColors]}>
-                {currentStatus}
-              </Badge>
               <div className="flex gap-1">
-                {Object.keys(statusColors).map((status) => {
-                  const Icon = statusIcons[status as keyof typeof statusIcons];
-                  return (
-                    <Button
-                      key={status}
-                      variant={currentStatus === status ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => handleStatusChange(status)}
-                      className="h-8"
-                    >
-                      <Icon className="h-3 w-3 ml-1" />
-                      {status}
-                    </Button>
-                  );
-                })}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDeleteChat}
+                  className="h-8 text-red-600 hover:text-red-700 hover:bg-red-100/50"
+                >
+                  <Trash2 className="h-3 w-3 ml-1" />
+                  حذف المحادثة
+                </Button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {chatMessages.map((message) => (
+          {pagination.hasMore && (
+            <div className="flex justify-center">
+              <Button 
+                variant="outline" 
+                onClick={handleLoadMoreMessages}
+                className="flex items-center gap-1"
+              >
+                <MoreHorizontal className="h-4 w-4" />
+                عرض المزيد من الرسائل (حاليا {displayedMessageCount})
+              </Button>
+            </div>
+          )}
+          {messages.map((message) => (
             <div key={message.id} className={cn(
               "flex",
-              message.sender === "admin" ? "justify-end" : 
-              message.sender === "internal_note" ? "justify-center" : "justify-start"
+              message.is_mine ? "justify-end" : "justify-start",
+              message.is_note && "justify-center"
             )}>
-              <div className={cn(
-                "max-w-xs lg:max-w-md px-4 py-2 rounded-lg",
-                message.sender === "system" 
-                  ? "bg-muted text-center w-full max-w-none text-sm"
-                  : message.sender === "internal_note"
-                  ? "bg-orange-100 border-l-4 border-orange-500 text-orange-800 w-full max-w-none"
-                  : message.sender === "admin"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted",
-                message.isOld && "opacity-60"
-              )}>
-                {message.sender === "internal_note" && (
-                  <div className="flex items-center gap-2 mb-1">
-                    <StickyNote className="h-4 w-4" />
-                    <span className="text-xs font-medium">ملاحظة للفريق الداخلي</span>
-                  </div>
-                )}
-                <p className="text-sm">{message.content}</p>
-                <p className={cn(
-                  "text-xs mt-1",
-                  message.sender === "admin" ? "text-primary-foreground/70" : 
-                  message.sender === "internal_note" ? "text-orange-600" : "text-muted-foreground"
-                )}>
-                  {message.timestamp}
-                  {message.isOld && " (محادثة قديمة)"}
-                </p>
-              </div>
+              {renderMessage(message)}
             </div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
 
-        {/* Message Input */}
         <div className="border-t p-4 space-y-3">
-          {/* ملاحظة داخلية */}
           {showNoteInput && (
             <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
               <div className="flex items-center gap-2 mb-2">
@@ -239,16 +482,26 @@ export default function SupportPage() {
                   value={newNote}
                   onChange={(e) => setNewNote(e.target.value)}
                   placeholder="اكتب ملاحظة للفريق الداخلي..."
-                  onKeyPress={(e) => e.key === 'Enter' && handleSendNote()}
+                  onKeyPress={(e) => e.key === 'Enter' && !isSending && handleSendNote()}
                   className="flex-1 bg-white"
+                  disabled={isSending}
                 />
-                <Button onClick={handleSendNote} disabled={!newNote.trim()} size="sm">
-                  <Send className="h-4 w-4" />
+                <Button 
+                  onClick={handleSendNote} 
+                  disabled={!newNote.trim() || isSending}
+                  size="sm"
+                >
+                  {isSending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
                 </Button>
                 <Button 
                   variant="outline" 
                   onClick={() => setShowNoteInput(false)}
                   size="sm"
+                  disabled={isSending}
                 >
                   إلغاء
                 </Button>
@@ -256,24 +509,24 @@ export default function SupportPage() {
             </div>
           )}
           
-          {/* رسالة عادية */}
           <div className="flex gap-2">
             <Input
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder="اكتب رسالتك هنا..."
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              onKeyPress={(e) => e.key === 'Enter' && !isSending && handleSendMessage()}
               className="flex-1"
+              disabled={isSending}
             />
             <Button 
-              variant="outline" 
-              onClick={() => setShowNoteInput(!showNoteInput)}
-              className="text-orange-600 border-orange-200 hover:bg-orange-50"
+              onClick={handleSendMessage} 
+              disabled={!newMessage.trim() || !selectedChat || isSending}
             >
-              <StickyNote className="h-4 w-4" />
-            </Button>
-            <Button onClick={handleSendMessage} disabled={!newMessage.trim()}>
-              <Send className="h-4 w-4" />
+              {isSending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
             </Button>
           </div>
         </div>
@@ -297,45 +550,46 @@ export default function SupportPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            {supportTickets.map((ticket) => {
-              const StatusIcon = statusIcons[ticket.status as keyof typeof statusIcons];
+            {chats.map((chat) => {
+              // const StatusIcon = statusIcons[currentStatus as keyof typeof statusIcons];
               return (
                 <div
-                  key={ticket.id}
-                  onClick={() => setSelectedTicket(ticket.id)}
+                  key={chat.user.id}
+                  onClick={() => setSelectedChat(chat.user.id)}
                   className={cn(
                     "flex items-center gap-4 p-4 rounded-lg border cursor-pointer transition-colors",
                     "hover:bg-muted/50",
-                    ticket.unread && "bg-muted/30 border-primary/20"
+                    !chat.last_message.is_read && "bg-muted/30 border-primary/20"
                   )}
                 >
                   <Avatar>
+                    <AvatarImage src={chat.user.image} />
                     <AvatarFallback>
-                      {ticket.marketerName.split(' ')[0][0]}
+                      {chat.user.name.split(' ')[0][0]}
                     </AvatarFallback>
                   </Avatar>
                   
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-medium truncate">{ticket.marketerName}</h4>
-                      {ticket.unread && (
+                      <h4 className="font-medium truncate">{chat.user.name}</h4>
+                      {!chat.last_message.is_read && (
                         <div className="h-2 w-2 bg-primary rounded-full" />
                       )}
                     </div>
                     <p className="text-sm text-muted-foreground mb-1">
-                      {ticket.subject}: {ticket.lastMessage}
+                      {chat.last_message.message}
                     </p>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Clock className="h-3 w-3" />
-                      {ticket.timestamp}
+                      {chat.last_message.created_since}
                     </div>
                   </div>
                   
                   <div className="flex items-center gap-2">
-                    <Badge className={statusColors[ticket.status as keyof typeof statusColors]}>
+                    {/* <Badge className={statusColors[currentStatus as keyof typeof statusColors]}>
                       <StatusIcon className="h-3 w-3 ml-1" />
-                      {ticket.status}
-                    </Badge>
+                      {currentStatus}
+                    </Badge> */}
                     <MessageSquare className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </div>

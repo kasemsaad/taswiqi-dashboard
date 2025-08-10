@@ -30,6 +30,8 @@ import UploadExcelCode from "./pages/markter/ReferralCode/UploadExcelCode";
 import WithdrawalsPage from "./pages/markter/Withdrawal/WithdrawalsPage";
 import CommunityPage from "./pages/CommunityPage";
 import AchievementsPage from "./pages/AchievementsPage";
+import Qr from "./pages/markter/qr/Qr";
+import QrAdd from "./pages/markter/qr/QrAdd";
 import SupportPage from "./pages/SupportPage";
 import VerificationPage from "./pages/markter/Approval/VerificationPage";
 import EditVerificationPage from "./pages/markter/Approval/VerfcationRequest";
@@ -48,12 +50,15 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-            <Route path="login" element={<Login  />} />
-          <Route path="/"  element={
+          <Route path="login" element={<Login />} />
+          <Route
+            path="/"
+            element={
               <ProtectedRoute>
                 <DashboardLayout />
               </ProtectedRoute>
-            }>
+            }
+          >
             <Route index element={<ReportsPage />} />
             <Route index element={<ReportsPage />} />
             <Route path="reports" element={<DetailedReportsPage />} />
@@ -67,25 +72,48 @@ const App = () => (
             <Route path="companies/edit/:id" element={<EditCompanyPage />} />
             <Route path="withdrawals" element={<WithdrawalsPage />} />
             <Route path="requsetWithdrawal" element={<RequsetWithdrawal />} />
-            <Route path="requsetWithdrawal/info/:id" element={<RequsetIinfo />} />
-            <Route path="requsetWithdrawal/infoCustomers/:id" element={<InfoCustomersWithBalance />} />
+            <Route
+              path="requsetWithdrawal/info/:id"
+              element={<RequsetIinfo />}
+            />
+            <Route
+              path="requsetWithdrawal/infoCustomers/:id"
+              element={<InfoCustomersWithBalance />}
+            />
             <Route path="linksCodes" element={<LinksCodes />} />
             <Route path="LinksCodes/addReferral" element={<AddReferral />} />
             <Route path="LinksCodes/addReferral" element={<AddReferral />} />
-            <Route path="LinksCodes/editReferral/:id" element={<EditReferral />} />
+            <Route
+              path="LinksCodes/editReferral/:id"
+              element={<EditReferral />}
+            />
             <Route path="LinksCodes/addCode" element={<AddCode />} />
             <Route path="LinksCodes/editCode/:id" element={<EditCode />} />
-            <Route path="LinksCodes/UploadExcelReferral" element={<UploadExcelReferral />} />
-            <Route path="LinksCodes/UploadExcelCode" element={<UploadExcelCode />} />
+            <Route
+              path="LinksCodes/UploadExcelReferral"
+              element={<UploadExcelReferral />}
+            />
+            <Route
+              path="LinksCodes/UploadExcelCode"
+              element={<UploadExcelCode />}
+            />
             <Route path="requests" element={<RequestsPage />} />
-            <Route path="requests/addReferral/:id" element={<AddReferralRequests />} />
+            <Route
+              path="requests/addReferral/:id"
+              element={<AddReferralRequests />}
+            />
             <Route path="requests/addCode/:id" element={<AddRequestCode />} />
             <Route path="community" element={<CommunityPage />} />
             <Route path="achievements" element={<AchievementsPage />} />
-            <Route path="verification/edit/:id" element={<EditVerificationPage />} />
+            <Route
+              path="verification/edit/:id"
+              element={<EditVerificationPage />}
+            />
             <Route path="verification" element={<VerificationPage />} />
             <Route path="notification" element={<AddNotification />} />
             <Route path="support" element={<SupportPage />} />
+            <Route path="qr" element={<Qr />} />
+            <Route path="qr/add" element={<QrAdd />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
           <Route path="*" element={<NotFound />} />

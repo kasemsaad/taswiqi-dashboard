@@ -124,19 +124,19 @@ export default function MarketersPage() {
   // };
 
   const marketersColumns: TableColumn[] = [
-    {
-      key: "logo",
-      header: "الشعار",
-      render: (marketer) => (
-        <div>
-            <div className="font-medium ">
-              <a href={`/companies/${marketer.id}`}>
+      {
+    key: "logo_column",  // Changed from "logo" to be more specific
+    header: "الشعار",
+    render: (marketer) => (
+      <div>
+        <div className="font-medium">
+          <a href={`/companies/${marketer.id}`}>
             <img width={70} height={70} src={marketer.logo} alt="company" />
           </a>
         </div>
-        </div>
-      ),
-    },
+      </div>
+    ),
+  },
     {
       key: "name",
       header: "أسم الشركة",
@@ -214,28 +214,31 @@ export default function MarketersPage() {
         </Badge>
       ),
     },
-      {
-      key: "id",
-      header: "ملف الشركة",
-      render: (marketer) => (
-        <div className="font-medium ps-5">
-              <Link to={`/companies/edit/${marketer.id}`}>
-            <img src={company} alt="company" />
-          </Link>
-        </div>
-      ),
-    },
-      {
-      key: "id",
-      header: "اجراءات",
-      render: (marketer) => (
-        <div className="font-medium ps-5">
-              <button onClick={()=>{deleteBrandsFunction(marketer.id)}} className="text-muted-foreground hover:text-destructive">
-            <img src={Delete} alt="company" />
-          </button>
-        </div>
-      ),
-    },
+       {
+    key: "company_profile_column",  // Changed from "id"
+    header: "ملف الشركة",
+    render: (marketer) => (
+      <div className="font-medium ps-5">
+        <Link to={`/companies/edit/${marketer.id}`}>
+          <img src={company} alt="company" />
+        </Link>
+      </div>
+    ),
+  },
+  {
+    key: "actions_column",  // Changed from "id"
+    header: "اجراءات",
+    render: (marketer) => (
+      <div className="font-medium ps-5">
+        <button 
+          onClick={() => { deleteBrandsFunction(marketer.id) }} 
+          className="text-muted-foreground hover:text-destructive"
+        >
+          <img src={Delete} alt="company" />
+        </button>
+      </div>
+    ),
+  },
   ];
 
   return (

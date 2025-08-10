@@ -25,13 +25,6 @@ export interface ApiReview {
     email: string;
   };
 }
-
-
-
-
-
-
-
 export interface GetParams {
   sort_by?: string;
   sort_order?: "asc" | "desc";

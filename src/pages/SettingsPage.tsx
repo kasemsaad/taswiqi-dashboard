@@ -173,6 +173,7 @@ export default function SettingsPage() {
     }
   };
 
+
   useEffect(() => {
     fetchSettings();
   }, []);
@@ -321,7 +322,32 @@ export default function SettingsPage() {
                 }}
               />
             </div>
-
+  {/*   إصدار ios */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium block"> إصدار Ios</label>
+              <Input
+                value={getSettingValue("ios_app_version")}
+                onChange={(e) => {
+                  const index = settings.findIndex(
+                    (s) => s.key === "ios_app_version"
+                  );
+                  if (index !== -1) handleSettingChange(index, e.target.value);
+                }}
+              />
+            </div>
+            {/*   إصدار Android */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium block"> إصدار Android</label>
+              <Input
+                value={getSettingValue("android_app_version")}
+                onChange={(e) => {
+                  const index = settings.findIndex(
+                    (s) => s.key === "android_app_version"
+                  );
+                  if (index !== -1) handleSettingChange(index, e.target.value);
+                }}
+              />
+            </div>
             {/* شعار الموقع */}
             <div className="space-y-2">
               <label className="text-sm font-medium block">شعار الموقع</label>
@@ -359,6 +385,7 @@ export default function SettingsPage() {
                 }}
               />
             </div>
+          
           <div className="w-full flex justify-center">
               <img className="h-28 w-28" src={getSettingValue("logo")} alt="logo" />
               </div>

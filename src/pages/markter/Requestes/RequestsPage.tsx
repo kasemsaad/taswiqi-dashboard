@@ -104,33 +104,17 @@ export default function MarketersPage() {
     setPage(1);
   };
 
-  // const handleViewProfile = (marketer: any) => {
-  //   navigate(`/marketers/${marketer.id}`);
-  // };
 
   const marketersColumns: TableColumn[] = [
-    // {
-    //   key: "logo",
-    //   header: "الشعار",
-    //   render: (marketer) => (
-    //     <div>
-    //       <div className="font-medium ">
-    //         <a href={`/companies/${marketer.id}`}>
-    //           <img width={70} height={70} src={marketer.logo} alt="company" />
-    //         </a>
-    //       </div>
-    //     </div>
-    //   ),
-    // },
-    {
-      key: "id",
-      header: "الرقم المرجعي",
-      render: (marketer) => (
-        <div className="space-y-1">
-          <div className="text-sm">{marketer.id}</div>
-        </div>
-      ),
-    },
+     {
+    key: "id_column",  // Changed from "id" to make it unique
+    header: "الرقم المرجعي",
+    render: (marketer) => (
+      <div className="space-y-1">
+        <div className="text-sm">{marketer.id}</div>
+      </div>
+    ),
+  },
     {
       key: "user",
       header: "أسم المسوّق",
@@ -168,20 +152,20 @@ export default function MarketersPage() {
       ),
     },
 
-    {
-      key: "id",
-      header: "إسناد",
-      render: (marketer) => (
-        <div className="font-medium ps-5">
-          <Link
+     {
+    key: "assignment_column",  // Changed from "id" to make it unique
+    header: "إسناد",
+    render: (marketer) => (
+      <div className="font-medium ps-5">
+        <Link
           to={marketer.type=="referral_link"?`/requests/addReferral/${marketer.id}`:`/requests/addCode/${marketer.id}`}
-            className="text-muted-foreground hover:text-destructive"
-          >
-            <img src={Linka} alt="Link" />
-          </Link>
-        </div>
-      ),
-    },
+          className="text-muted-foreground hover:text-destructive"
+        >
+          <img src={Linka} alt="Link" />
+        </Link>
+      </div>
+    ),
+  },
   ];
 
   return (

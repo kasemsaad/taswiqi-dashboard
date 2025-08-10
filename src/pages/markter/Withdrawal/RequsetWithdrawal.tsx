@@ -124,7 +124,7 @@ export default function MarketersPage() {
   // Columns for discount codes table
   const requestColumns: TableColumn[] = [
     {
-      key: "id",
+      key: "id_column",
       header: "الرقم المرجعي",
       render: (marketer) => (
         <div className="space-y-1">
