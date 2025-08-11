@@ -50,7 +50,6 @@ import {
   GetNotificationsUnReadedCount,
   GetAllSettings,
 } from "@/services/userService";
-import { Line } from "recharts";
 
 interface Notification {
   id: number;

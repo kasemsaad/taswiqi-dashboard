@@ -145,7 +145,7 @@ export default function WithdrawalsPage() {
     setIsProcessDialogOpen(true);
   };
 
-  const handleStatusChange = (status: string) => {
+  const handleStatusChange = () => {
     if (selectedWithdrawal) {
       // Handle status change logic
       setIsProcessDialogOpen(false);
