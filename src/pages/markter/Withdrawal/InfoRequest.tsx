@@ -176,8 +176,8 @@ const InfoRequestPage = () => {
                   description: " بنجاح تم الموافقة الطلب",
                   variant: "success",
                 });
+                navigate("/requsetWithdrawal");
                 setTimeout(() => {
-                  navigate("/requsetWithdrawal");
                 }, 1000);
               }}
             >

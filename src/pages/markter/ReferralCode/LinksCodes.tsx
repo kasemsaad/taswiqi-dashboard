@@ -9,7 +9,7 @@ import {
   deleteDiscountCode,
   deleteReferralLink,
   GetAllReferralLinkspage,
-  GetAllCodespage,
+  GetAllCodes,
   GetNumbersReferralLinks,
   GetNumbersCodes,
 } from "@/services/userService";
@@ -51,7 +51,7 @@ export default function MarketersPage() {
   
   const [Referral, setReferral] = useState<any>(null);
   const [Codes, setCodes] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<"links" | "codes">("links");
+  const [activeTab, setActiveTab] = useState<"links" | "codes">("codes");
 
   const [ReferralNumbers, setReferralNumbers] = useState({
     referral_links_count: 0,
@@ -92,6 +92,7 @@ export default function MarketersPage() {
         inactive_discount_codes_count: number;
         used_discount_codes_this_month_count: number;
       });
+     
     } catch (error) {
       console.error("Error fetching statistics:", error);
     }
@@ -147,6 +148,7 @@ export default function MarketersPage() {
       });
 
       setReferral(response.data);
+       console.log("referralRes",response.data)
       if (response.meta) {
         setReferralTotalItems(response.meta.total);
       }
@@ -161,12 +163,13 @@ export default function MarketersPage() {
   const fetchCodes = async () => {
     try {
       setLoading(true);
-      const response = await GetAllCodespage({
+      const response = await GetAllCodes({
         page: codesPage,
         per_page: codesPerPage,
         searchTerm: searchTerm || undefined,
         filter: statusFilter !== "all" ? { status: statusFilter } : undefined,
       });
+      console.log("code",response.data)
 
       setCodes(response.data);
       if (response.meta) {
@@ -186,13 +189,10 @@ export default function MarketersPage() {
     setCodesPage(1);
   };
 
-  // Initial data fetch
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
+  
   // Fetch data when pagination or filters change
   useEffect(() => {
+    fetchStats();
     if (activeTab === "links") {
       fetchReferral();
     } else {
@@ -304,73 +304,73 @@ export default function MarketersPage() {
     {
       key: "code",
       header: "الكود",
-      render: (marketer) => (
+      render: (marketerCode) => (
         <div className="space-y-1">
-          <div className="text-sm">{marketer.code}</div>
+          <div className="text-sm">{marketerCode.code}</div>
         </div>
       ),
     },
     {
       key: "brand",
       header: "الشركة",
-      render: (marketer) => (
+      render: (marketerCode) => (
         <div className="space-y-1">
-          <div className="text-sm">{marketer.brand}</div>
+          <div className="text-sm">{marketerCode.brand}</div>
         </div>
       ),
     },
     {
       key: "for_user",
       header: "مخصّص ل",
-      render: (marketer) => (
+      render: (marketerCode) => (
         <div className="space-y-1">
-          <div className="text-sm">{marketer.for_user}</div>
+          <div className="text-sm">{marketerCode.for_user}</div>
         </div>
       ),
     },
     {
       key: "created_at",
       header: "تاريخ الإضافة",
-      render: (marketer) => (
+      render: (marketerCode) => (
         <div className="space-y-1">
-          <div className="text-sm">{marketer.created_at}</div>
+          <div className="text-sm">{marketerCode.created_at}</div>
         </div>
       ),
     },
     {
       key: "usered_at",
       header: "تاريخ آخر استخدام",
-      render: (marketer) => (
+      render: (marketerCode) => (
         <div className="space-y-1">
-          <div className="text-sm">{marketer.usered_at}</div>
+          <div className="text-sm">{marketerCode.usered_at}</div>
         </div>
       ),
     },
     {
       key: "total_clients",
       header: "عدد الإحالات",
-      render: (marketer) => (
+      render: (marketerCode) => (
         <div className="space-y-1">
-          <div className="text-sm">{marketer.total_clients}</div>
+          <div className="text-sm">{marketerCode.total_clients}</div>
         </div>
       ),
     },
     {
       key: "status",
       header: "الحالة",
-      render: (marketer) => (
+      render: (marketerCode) => (
         <Badge
           className={
-            marketer.status == "active"
+            marketerCode.status == "active"
               ? "status-active"
-              : marketer.status == "expired"
+              : marketerCode.status == "expired"
               ? "status-inactive"
               : "status-pending"
           }
         >
-          {marketer.status == "active"
+          {marketerCode.status == "active"
             ? "نشط"
-            : marketer.status == "expired"
+            : marketerCode.status == "expired"
             ? "منتهي"
             : "معطل"}
         </Badge>
@@ -379,16 +379,16 @@ export default function MarketersPage() {
     {
       key: "id",
       header: "اجراءات",
-      render: (marketer) => (
+      render: (marketerCode) => (
         <div className="font-medium ps-5 flex gap-2">
           <button
-            onClick={() => navigate(`editCode/${marketer.id}`)}
+            onClick={() => navigate(`editCode/${marketerCode.id}`)}
             className="text-muted-foreground hover:text-destructive"
           >
             <img src={Eye} alt="view" />
           </button>
           <button
-            onClick={() => deleteCode(marketer.id)}
+            onClick={() => deleteCode(marketerCode.id)}
             className="text-muted-foreground hover:text-destructive"
           >
             <img src={Delete} alt="delete" />
@@ -594,7 +594,8 @@ export default function MarketersPage() {
     أكواد الخصم
   </TabsTrigger>
 </TabsList>
-        
+
+
         {/* Referral Links Table */}
         <TabsContent value="links" className="space-y-4" dir="rtl">
           <Card className="dashboard-card">

@@ -179,21 +179,23 @@ const Login = () => {
                   >
                     كلمة المرور
                   </label>
-                  <Field name="password">
-                    {({ field }: { field: FieldInputProps<string> }) => (
-                      <Password
-                        id="password"
-                        {...field}
-                        toggleMask
-                        feedback={false}
-                        placeholder="كلمة المرور"
-                        aria-label="Password"
-                        disabled={isLoading}
-                        className="w-full"
-                        inputClassName="w-full  ps-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                      />
-                    )}
-                  </Field>
+                <Field name="password" type="password">
+  {({ field, form }: { field: FieldInputProps<string>; form: any }) => (
+    <Password
+    toggleMask
+      id="password"
+      type="password"
+      value={field.value || ""}
+      onChange={(e) => form.setFieldValue(field.name, e.target.value)}
+      feedback={false}
+      placeholder="كلمة المرور"
+      aria-label="Password"
+      disabled={isLoading}
+      className="w-full"
+      inputClassName="w-full ps-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+    />
+  )}
+</Field>
 
                   <ErrorMessage
                     name="password"
@@ -208,7 +210,7 @@ const Login = () => {
 
                 <Button
                   type="submit"
-                  label={isLoading ? "" : "Sign in"}
+                  label={isLoading ? "" : "تسجيل"}
                   disabled={isLoading || isSubmitting}
                   className="!bg-primary text-white !border-0 w-full h-[3rem] flex justify-center items-center text-2xl !p-0"
                 >

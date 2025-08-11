@@ -65,7 +65,9 @@
   left: 0.5rem;
   direction: ltr;
 }
-
+.p-input-icon{
+  height: 0;
+}
 #login input {
   transition: box-shadow 0.2s ease;
 }

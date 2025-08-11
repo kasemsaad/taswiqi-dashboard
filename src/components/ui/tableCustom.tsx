@@ -120,9 +120,9 @@ export const GeneralTable = ({
 
   return (
     <div className="space-y-4">
-      <div className={`relative   shadow-md sm:rounded-lg ${className}`}>
-        <div className="block max-w-screen-xl ">
-          <Table className={`w-full  ${rtl ? "rtl-table overflow-x-scroll" : ""}`}>
+      <div className={`relative overflow-x-auto shadow-md sm:rounded-lg ${className}`}>
+        <div className="block w-full overflow-x-auto">
+          <Table className={`w-full ${rtl ? "rtl-table" : ""}`}>
             <TableHeader>
               <TableRow>
                 {columns.map((column) => (

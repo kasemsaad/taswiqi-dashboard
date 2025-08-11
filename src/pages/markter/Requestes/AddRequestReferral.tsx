@@ -11,7 +11,7 @@ import { ArrowRight, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   CreateRequest,
-  GetAllReferralpage,
+  GetAllReferralNotRreserved,
   GetReferralRequestById,
 } from "@/services/userService";
 import {
@@ -21,7 +21,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup } from "@/components/ui/command";
+import { Command, CommandInput, CommandList, CommandGroup } from "@/components/ui/command";
 
 const validationSchema = Yup.object().shape({
   referral_link_id: Yup.string().required("رابط الإحالة مطلوب"),
@@ -67,7 +67,7 @@ const AddReferralPage = () => {
 
   const fetchCodeList = async (search: string) => {
     try {
-      const response = await GetAllReferralpage({
+      const response = await GetAllReferralNotRreserved({
         searchTerm: search || undefined,
       });
       const CodeData = Array.isArray(response?.data) ? response.data : [];
@@ -187,8 +187,9 @@ const AddReferralPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="referral_link_id">رابط الإحالة *</Label>
-                <Select
-                  value={formik.values.referral_link_id}
+               
+                  <Select
+                  value={formik.values.referral_link_id?.toString() || ""}
                   onValueChange={(value) => {
                     formik.setFieldValue("referral_link_id", value);
                   }}
@@ -204,10 +205,9 @@ const AddReferralPage = () => {
                         onValueChange={setSearchTerm}
                       />
                       <CommandList>
-                        <CommandEmpty>لا توجد نتائج</CommandEmpty>
                         <CommandGroup>
                           {codes.map((code) => (
-                            <SelectItem key={code.id} value={code.id}>
+                            <SelectItem key={code.id} value={code.id.toString()}>
                               {code.link}
                             </SelectItem>
                           ))}

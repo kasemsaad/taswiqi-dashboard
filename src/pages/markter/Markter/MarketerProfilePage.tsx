@@ -417,7 +417,7 @@ export default function MarketerProfilePage() {
       header: "ملف الشركة",
       render: (Referral) => (
         <div className="font-medium ps-5">
-          <a href={`companies/edit/${Referral.id}`}>
+          <a href={`/companies/edit/${Referral.id}`}>
             <img src={company} alt="company" />
           </a>
         </div>
@@ -498,7 +498,7 @@ export default function MarketerProfilePage() {
       });
     }
   };
-  const handlePushNotification = async (id: string) => {
+  const handlePushNotification = async () => {
     const notificationPayload = {
       title: {
         ar: titleAr,
@@ -508,7 +508,8 @@ export default function MarketerProfilePage() {
         ar: bodyAr,
         en: bodyEn,
       },
-      user_id: id, // أو id فقط حسب هيكل بياناتك
+      users: [Customer.user_id], // أو id فقط حسب هيكل بياناتك
+      target: "given_ids", // أو id فقط حسب هيكل بياناتك
       image, // أو id فقط حسب هيكل بياناتك
     };
     if (!titleAr || !titleEn || !bodyAr || !bodyEn || !image) {
@@ -745,7 +746,7 @@ export default function MarketerProfilePage() {
             <DialogFooter>
               <Button
                 onClick={() => {
-                  handlePushNotification(Customer?.id);
+                  handlePushNotification();
                 }}
               >
                 إرسال الإشعار

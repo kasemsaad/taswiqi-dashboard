@@ -428,18 +428,34 @@ export const GetAllReferralpage = async (
   });
   return response.data;
 };
-export const GetAllCodespage = async (
-  params?: GetParams
-): Promise<UsersServices> => {
-  const response = await Api.get<UsersServices>(`referral-link`, {
-    params,
-  });
-  return response.data;
-};
+// export const GetAllCodespage = async (
+//   params?: GetParams
+// ): Promise<UsersServices> => {
+//   const response = await Api.get<UsersServices>(`referral-link`, {
+//     params,
+//   });
+//   return response.data;
+// };
 export const GetAllCodes = async (
   params?: GetParams
 ): Promise<UsersServices> => {
   const response = await Api.get<UsersServices>(`discount-code`, {
+    params,
+  });
+  return response.data;
+};
+export const GetAllCodesNotRreserved = async (
+  params?: GetParams
+): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>(`discount-code/get-not-reserved`, {
+    params,
+  });
+  return response.data;
+};
+export const GetAllReferralNotRreserved = async (
+  params?: GetParams
+): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>(`referral-link/get-not-reserved`, {
     params,
   });
   return response.data;
@@ -543,5 +559,17 @@ export const GetNotificationsUnReadedCount = async (params?: GetParams): Promise
   const response = await Api.get<UsersServices>("notifications/get-unreaded-count", {
     params,
   });
+  return response.data;
+};
+export const DeleteNotificationyId = async (id: string): Promise<UsersServices> => {
+  const response = await Api.delete<UsersServices>(
+    `notifications/delete/${id}`
+  );
+  return response.data;
+};
+export const DeleteNotificationsReadit = async (): Promise<UsersServices> => {
+  const response = await Api.delete<UsersServices>(
+    `notifications/delete-readed`
+  );
   return response.data;
 };

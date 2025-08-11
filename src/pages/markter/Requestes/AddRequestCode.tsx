@@ -11,7 +11,7 @@ import { ArrowRight, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   CreateRequest,
-  GetAllCodes,
+  GetAllCodesNotRreserved,
   GetReferralRequestById,
 } from "@/services/userService";
 import {
@@ -21,7 +21,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup } from "@/components/ui/command";
+import { Command, CommandInput, CommandList, CommandGroup } from "@/components/ui/command";
 
 const validationSchema = Yup.object().shape({
   discount_code_id: Yup.string().required("كود خصم مطلوب"),
@@ -67,7 +67,7 @@ const AddCodePage = () => {
 
   const fetchCodeList = async (search: string) => {
     try {
-      const response = await GetAllCodes({
+      const response = await GetAllCodesNotRreserved({
         searchTerm: search || undefined,
       });
       const CodeData = Array.isArray(response?.data) ? response.data : [];
@@ -187,35 +187,35 @@ const AddCodePage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="discount_code_id">كود خصم *</Label>
-                <Select
-                  value={formik.values.discount_code_id}
-                  onValueChange={(value) => {
-                    formik.setFieldValue("discount_code_id", value);
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="اختر كود خصم" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <Command shouldFilter={false}>
-                      <CommandInput
-                        placeholder="ابحث عن كود..."
-                        value={searchTerm}
-                        onValueChange={setSearchTerm}
-                      />
-                      <CommandList>
-                        <CommandEmpty>لا توجد نتائج</CommandEmpty>
-                        <CommandGroup>
-                          {codes.map((code) => (
-                            <SelectItem key={code.id} value={code.id}>
-                              {code.code}
-                            </SelectItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </SelectContent>
-                </Select>
+             <Select
+  value={formik.values.discount_code_id?.toString() || ""}
+  onValueChange={(value) => {
+    formik.setFieldValue("discount_code_id", value);
+  }}
+>
+  <SelectTrigger>
+    <SelectValue placeholder="اختر كود خصم" />
+  </SelectTrigger>
+  <SelectContent>
+    <Command shouldFilter={false}>
+      <CommandInput
+        placeholder="ابحث عن كود..."
+        value={searchTerm}
+        onValueChange={setSearchTerm}
+      />
+      <CommandList>
+        <CommandGroup>
+          {codes.map((code) => (
+            <SelectItem key={code.id} value={code.id.toString()}>
+              {code.code}
+            </SelectItem>
+          ))}
+        </CommandGroup>
+      </CommandList>
+    </Command>
+  </SelectContent>
+</Select>
+
                 {formik.touched.discount_code_id &&
                   formik.errors.discount_code_id && (
                     <div className="text-sm text-red-500">

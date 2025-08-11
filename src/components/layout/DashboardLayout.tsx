@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Outlet, useNavigate, NavLink, Link } from "react-router-dom";
 import { Role } from "../../redux/resourcesSlice";
-// import logo from "@/assets/logo.svg";
 import { selectHeader, selectLogo } from "@/redux/resourcesSlice";
 
 import {
@@ -25,7 +24,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
-  
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -49,6 +48,8 @@ import {
   GetAllNotifications,
   GetNotificationsUnReadedCount,
   GetAllSettings,
+  DeleteNotificationsReadit,
+  DeleteNotificationyId
 } from "@/services/userService";
 
 interface Notification {
@@ -61,16 +62,6 @@ interface Notification {
   image: string | null;
   created_at?: string;
 }
-
-// interface NotificationsResponse {
-//   data: Notification[];
-//   meta: {
-//     total: number;
-//     current_page: number;
-//     per_page: number;
-//     last_page: number;
-//   };
-// }
 
 const navigation = [
   { name: "الرئيسية", href: "/", icon: Home },
@@ -92,9 +83,7 @@ export default function DashboardLayout() {
   const [count, setIscount] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [liveNotifications, setLiveNotifications] = useState<Notification[]>(
-    []
-  );
+  const [liveNotifications, setLiveNotifications] = useState<Notification[]>([]);
   const [logo, setlogo] = useState("");
   const [Name, setName] = useState("");
   const logoState = useAppSelector(selectLogo);
@@ -119,12 +108,12 @@ export default function DashboardLayout() {
       console.error("Error fetching notifications:", error);
     }
   };
+
   const fetchLogo = async () => {
     try {
       const response = await GetAllSettings();
       const dataArray = Array.isArray(response?.data) ? response.data : [];
 
-      // Find the "logo" key and get its value
       const logoItem = dataArray.find((item) => item.key === "logo");
       const valueLogo = logoItem ? logoItem.value : null;
       const site_name_ar = dataArray.find(
@@ -138,6 +127,7 @@ export default function DashboardLayout() {
       console.error("Error fetching settings:", error);
     }
   };
+
   const fetchNotifications = async (page = 1, perPage = 5) => {
     try {
       const response = await GetAllNotifications({
@@ -180,10 +170,43 @@ export default function DashboardLayout() {
     }
   };
 
-  // const handlePerPageChange = (newPerPage: number) => {
-  //   setPagination((prev) => ({ ...prev, perPage: newPerPage, currentPage: 1 }));
-  //   fetchNotifications(1, newPerPage);
-  // };
+  // Function to delete notification by ID
+  const handleDeleteNotification = async (id: number) => {
+    try {
+      const response = await DeleteNotificationyId(`${id}`);
+      if (response.status) {
+        toast.success("تم حذف الإشعار بنجاح");
+        // Remove the deleted notification from state
+        setLiveNotifications(prev => prev.filter(notification => notification.id !== id));
+        // Update the count if the deleted notification was unread
+        const deletedNotification = liveNotifications.find(n => n.id === id);
+        if (deletedNotification?.unread) {
+          setIscount(prev => prev - 1);
+        }
+      }
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+      toast.error("حدث خطأ أثناء حذف الإشعار");
+    }
+  };
+
+  // Function to delete all unread notifications
+  const handleDeleteUnreadNotifications = async () => {
+    try {
+      const response = await DeleteNotificationsReadit();
+      if (response.status) {
+        toast.success("تم حذف جميع الإشعارات غير المقروءة بنجاح");
+        // Remove unread notifications from state
+        setLiveNotifications(prev => prev.filter(notification => !notification.unread));
+        // Reset the count to 0
+        fetchNotifications()
+        setIscount(0);
+      }
+    } catch (error) {
+      console.error("Error deleting unread notifications:", error);
+      toast.error("حدث خطأ أثناء حذف الإشعارات غير المقروءة");
+    }
+  };
 
   useEffect(() => {
     fetchcount();
@@ -232,10 +255,6 @@ export default function DashboardLayout() {
     dispatch(Role(""));
     navigate("/login");
   };
-
-  // const viewAllNotifications = () => {
-  //   navigate("/notification");
-  // };
 
   return (
     <div className="min-h-screen bg-background">
@@ -304,10 +323,21 @@ export default function DashboardLayout() {
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-72 sm:w-96 p-0" align="end">
-                <div className="p-3 sm:p-4 border-b">
+                <div className="p-3 sm:p-4 border-b flex justify-between items-center">
                   <h3 className="font-semibold text-sm sm:text-base">
                     الاشعارات
                   </h3>
+                  
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 text-destructive"
+                      onClick={handleDeleteUnreadNotifications}
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      حذف غير المقروء
+                    </Button>
+                  
                 </div>
                 <div className="max-h-80 overflow-y-auto">
                   {liveNotifications.length === 0 ? (
@@ -319,7 +349,7 @@ export default function DashboardLayout() {
                       <div
                         key={notification.id}
                         className={cn(
-                          "p-3 sm:p-4 border-b hover:bg-muted/50 cursor-pointer transition-colors",
+                          "p-3 sm:p-4 border-b hover:bg-muted/50 cursor-pointer transition-colors group",
                           notification.unread && "bg-muted/30"
                         )}
                       >
@@ -340,9 +370,22 @@ export default function DashboardLayout() {
                             </div>
                           )}
                           <div className="flex-1">
-                            <h4 className="font-medium text-xs sm:text-sm">
-                              {notification.title}
-                            </h4>
+                            <div className="flex justify-between items-start">
+                              <h4 className="font-medium text-xs sm:text-sm">
+                                {notification.title}
+                              </h4>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-destructive"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteNotification(notification.id);
+                                }}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
                             <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                               {notification.body}
                             </p>
@@ -357,7 +400,6 @@ export default function DashboardLayout() {
                 </div>
                 <div className="p-2 sm:p-3 border-t flex flex-col gap-2">
                   <div className="flex items-center justify-between">
-                    {/* Pagination */}
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-muted-foreground">
                         الصفحة:
@@ -394,32 +436,11 @@ export default function DashboardLayout() {
                         </Button>
                       </div>
                     </div>
-                    {/* Per page */}
-                    {/* <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">لكل صفحة:</span>
-                      <select
-                        value={pagination.perPage}
-                        onChange={(e) => handlePerPageChange(Number(e.target.value))}
-                        className="text-xs bg-background border rounded p-1"
-                      >
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="15">15</option>
-                      </select>
-                    </div> */}
                   </div>
-                  {/* <Button
-                    variant="ghost"
-                    className="w-full text-xs sm:text-sm"
-                    onClick={viewAllNotifications}
-                  >
-                    عرض جميع الاشعارات
-                  </Button> */}
                 </div>
               </PopoverContent>
             </Popover>
 
-            {/* Profile menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="hidden sm:flex">
@@ -428,11 +449,11 @@ export default function DashboardLayout() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                {/* <DropdownMenuItem>الملف الشخصي</DropdownMenuItem> */}
-
-                <Link to="/settings"> <DropdownMenuItem>
-                 الإعدادات 
-                </DropdownMenuItem></Link>
+                <Link to="/settings"> 
+                  <DropdownMenuItem>
+                    الإعدادات 
+                  </DropdownMenuItem>
+                </Link>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="text-destructive"
@@ -448,7 +469,6 @@ export default function DashboardLayout() {
 
       {/* Layout */}
       <div className="flex">
-        {/* Sidebar */}
         <aside
           className={cn(
             "bg-sidebar border-l border-sidebar-border transition-all duration-300 ease-in-out",
@@ -481,7 +501,6 @@ export default function DashboardLayout() {
           </nav>
         </aside>
 
-        {/* Content */}
         {isSidebarOpen && isMobile && (
           <div
             className="fixed inset-0 bg-black/50 z-30 lg:hidden"
