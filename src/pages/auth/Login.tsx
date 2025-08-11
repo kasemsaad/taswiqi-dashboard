@@ -135,7 +135,6 @@ const Login = () => {
             useEffect(() => {
               const fetchToken = async () => {
                 const token = await generateFCMToken();
-                console.log("FCM Token:", token);
                 if (token) {
                   localStorage.setItem("fcmToken", token);
                   setFieldValue("fcmToken", token);

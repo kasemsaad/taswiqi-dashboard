@@ -1,27 +1,5 @@
 import Api from "./baseUrlCustomer";
 import type { UsersServices } from "../components/interfaces/Interfaces";
-
-// Roles
-// export const GetAllRoles = async (
-//   params?: GetParams
-// ): Promise<UsersServices> => {
-//   const response = await Api.get<UsersServices>("roles", {
-//     params,
-//   });
-//   return response.data;
-// };
-// export const GetQrById = async (id: string): Promise<UsersServices> => {
-//   const response = await Api.get<UsersServices>(`whatsapp/get-session/${id}`);
-//   return response.data;
-// };
-// Roles
-// export const GetPermissionByRoleId = async (
-//   id: string
-// ): Promise<UsersServices> => {
-//   const response = await Api.get<UsersServices>(`roles/${id}`);
-//   return response.data;
-// };
-
 export const GetCustomersById = async (id: string): Promise<UsersServices> => {
   const response = await Api.get<UsersServices>(`customers/${id}`);
   return response.data;

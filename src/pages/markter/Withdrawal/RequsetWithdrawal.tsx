@@ -38,7 +38,8 @@ export default function MarketersPage() {
   // Separate pagination states for WithdrawRequests links
   const [WithdrawRequestsPage, setWithdrawRequestsPage] = useState(1);
   const [WithdrawRequestsPerPage, setWithdrawRequestsPerPage] = useState(10);
-  const [WithdrawRequestsTotalItems, setWithdrawRequestsTotalItems] = useState(0);
+  const [WithdrawRequestsTotalItems, setWithdrawRequestsTotalItems] =
+    useState(0);
 
   // Separate pagination states for discount codes
   const [codesPage, setCodesPage] = useState(1);
@@ -82,7 +83,7 @@ export default function MarketersPage() {
         page: codesPage,
         per_page: codesPerPage,
         searchTerm: searchTerm || undefined,
-       payment_status: statusFilter,
+        payment_status: statusFilter,
       });
 
       setCodes(response.data);
@@ -102,7 +103,6 @@ export default function MarketersPage() {
     setWithdrawRequestsPage(1);
     setCodesPage(1);
   };
-
 
   // Fetch data when pagination or filters change
   useEffect(() => {
@@ -277,7 +277,10 @@ export default function MarketersPage() {
       {/* Page Header */}
       <div className="md:flex items-center justify-between">
         <div>
-          <h1 className="text-xl md:text-3xl font-bold text-foreground"> طلبات السحب</h1>
+          <h1 className="text-xl md:text-3xl font-bold text-foreground">
+            {" "}
+            طلبات السحب
+          </h1>
           <p className="text-muted-foreground mt-1">قائمة بجميع طلبات السحب </p>
         </div>
       </div>
@@ -299,86 +302,73 @@ export default function MarketersPage() {
                 />
               </div>
             </div>
-          { activeTab =="requestes"&& <Select
-              value={statusFilter}
-              onValueChange={(value) => {
-                setStatusFilter(value);
-                setWithdrawRequestsPage(1);
-                setCodesPage(1);
-              }}
-            >
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="تصفية حسب الحالة" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">الحالات</SelectItem>
-                <SelectItem value="approved">ناجحة</SelectItem>
-                <SelectItem value="rejected">مرفوضة</SelectItem>
-                <SelectItem value="pending">قيد الإنتظار</SelectItem>
-              </SelectContent>
-            </Select>}
-           { activeTab =="accountDetection"&& <Select
-              value={statusFilter}
-              onValueChange={(value) => {
-                setStatusFilter(value);
-                setWithdrawRequestsPage(1);
-                setCodesPage(1);
-              }}
-            >
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="تصفية حسب المؤهل " />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">المؤهلات</SelectItem>
-                <SelectItem value="qualified">مؤهل</SelectItem>
-                <SelectItem value="Disqualified">غير مؤهل</SelectItem>
-              </SelectContent>
-            </Select>}
+            {activeTab == "requestes" && (
+              <Select
+                value={statusFilter}
+                onValueChange={(value) => {
+                  setStatusFilter(value);
+                  setWithdrawRequestsPage(1);
+                  setCodesPage(1);
+                }}
+              >
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="تصفية حسب الحالة" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">الحالات</SelectItem>
+                  <SelectItem value="approved">ناجحة</SelectItem>
+                  <SelectItem value="rejected">مرفوضة</SelectItem>
+                  <SelectItem value="pending">قيد الإنتظار</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+            {activeTab == "accountDetection" && (
+              <Select
+                value={statusFilter}
+                onValueChange={(value) => {
+                  setStatusFilter(value);
+                  setWithdrawRequestsPage(1);
+                  setCodesPage(1);
+                }}
+              >
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="تصفية حسب المؤهل " />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">المؤهلات</SelectItem>
+                  <SelectItem value="qualified">مؤهل</SelectItem>
+                  <SelectItem value="Disqualified">غير مؤهل</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
           </div>
         </CardContent>
       </Card>
 
       {/* Tabs for switching between tables */}
       <Tabs value={activeTab}>
-<div className="relative" dir="rtl">
-  <TabsList className="flex w-full overflow-x-auto pb-2 space-x-reverse space-x-2">
-          <TabsTrigger
-            value="requestes"
-            onClick={() => setActiveTab("requestes")}
-                className="whitespace-nowrap"
-
+        <div className="relative" dir="rtl">
+          <TabsList
+            className="flex w-full flex-wrap justify-end" // justify-end for RTL
+            dir="rtl"
           >
-            طلبات السحب{" "}
-          </TabsTrigger>
-          <TabsTrigger
-            value="accountDetection"
-            onClick={() => setActiveTab("accountDetection")}
-              className="whitespace-nowrap"
+            <TabsTrigger
+              value="requestes"
+              onClick={() => setActiveTab("requestes")}
+              className="flex-1 min-w-[120px] text-center"
+            >
+              طلبات السحب{" "}
+            </TabsTrigger>
+            <TabsTrigger
+              value="accountDetection"
+              onClick={() => setActiveTab("accountDetection")}
+              className="flex-1 min-w-[120px] text-center"
+            >
+              كشف حساب المسوّقين{" "}
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
-        >
-            كشف حساب المسوّقين{" "}
-          </TabsTrigger>
-        </TabsList>
-</div>
-   {/* <TabsList 
-  className="flex w-full flex-wrap justify-end" // justify-end for RTL
-  dir="rtl"
->
-  <TabsTrigger 
-    value="links" 
-    onClick={() => setActiveTab("links")}
-    className="flex-1 min-w-[120px] text-center"
-  >
-    روابط الإحالة
-  </TabsTrigger>
-  <TabsTrigger 
-    value="codes" 
-    onClick={() => setActiveTab("codes")}
-    className="flex-1 min-w-[120px] text-center"
-  >
-    أكواد الخصم
-  </TabsTrigger>
-</TabsList> */}
         {/* WithdrawRequests Links Table */}
         <TabsContent value="requestes" className="space-y-4" dir="rtl">
           <Card className="dashboard-card">

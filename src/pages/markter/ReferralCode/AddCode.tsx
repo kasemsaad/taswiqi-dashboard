@@ -59,7 +59,6 @@ const AddReferralPage = () => {
         formData.append("brand_id", values.brand_id);
         formData.append("earning_precentage", values.earning_precentage);
         formData.append("code", values.code);
-        console.log("dfdfsd", values);
         await CreareCode(values);
         toast({
           title: "تم بنجاح",

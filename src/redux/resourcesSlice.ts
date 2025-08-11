@@ -2,7 +2,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 // import { string } from 'yup';
 
 interface ResourcesState {
-  clientdata: string;
+  logoState: string | number | null;
+  headerState: string | number | null;
   burgerMenuState: boolean;
   activeLinkState: string | number | null;
   hasCenterState: boolean | null;
@@ -12,7 +13,8 @@ interface ResourcesState {
 }
 
 const initialState: ResourcesState = {
-  clientdata: "",
+  logoState: "",
+  headerState: "",
   burgerMenuState: false,
   activeLinkState: 0,
   hasCenterState: null,
@@ -25,6 +27,12 @@ const resourcesSlice = createSlice({
   name: 'resources',
   initialState,
   reducers: {
+    Logo(state, action: PayloadAction<string | number | null>) {
+      state.logoState = action.payload;
+    },
+    Header(state, action: PayloadAction<string | number | null>) {
+      state.headerState = action.payload;
+    },
     BurgerMenu(state, action: PayloadAction<boolean>) {
       state.burgerMenuState = action.payload;
     },
@@ -45,6 +53,8 @@ const resourcesSlice = createSlice({
     },
   },
 });
+export const selectLogo = (state: { resources: ResourcesState }) => state.resources.logoState;
+export const selectHeader = (state: { resources: ResourcesState }) => state.resources.headerState;
 
-export const { BurgerMenu,ActiveLink,HasCenter,IdsCheckbox,Role,RoleId  } = resourcesSlice.actions;
+export const { Logo,Header,BurgerMenu,ActiveLink,HasCenter,IdsCheckbox,Role,RoleId  } = resourcesSlice.actions;
 export default resourcesSlice.reducer;

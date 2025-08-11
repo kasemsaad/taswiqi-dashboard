@@ -64,7 +64,6 @@ const AddReferralPage = () => {
         formData.append("link", values.link);
         formData.append("earning_precentage", values.earning_precentage);
         formData.append("link_code", values.link_code);
-        console.log("dfdfsd", values);
         await CreareReferralLink(values);
         toast({
           title: "تم بنجاح",

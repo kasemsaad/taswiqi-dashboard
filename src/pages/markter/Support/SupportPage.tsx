@@ -330,7 +330,6 @@ const fetchMessages = async (userId: string, page: number = 1) => {
     fetchChats();
     
     const unsubscribe = onMessage(messaging, (payload) => {
-      console.log("New message notification:", payload);
       const { title, body } = payload.notification ?? {};
       toast(`${title}\n${body}`);
       fetchChats();

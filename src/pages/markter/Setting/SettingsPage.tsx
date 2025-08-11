@@ -106,7 +106,7 @@
 //             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 //               <div>
 //                 <label className="text-sm font-medium">الشروط والأحكام</label>
-//                 <Textarea 
+//                 <Textarea
 //                   placeholder="اكتب الشروط والأحكام هنا..."
 //                   className="min-h-40 mt-1"
 //                   defaultValue="شروط وأحكام استخدام تطبيق تسويقي..."
@@ -114,7 +114,7 @@
 //               </div>
 //               <div>
 //                 <label className="text-sm font-medium">سياسة الخصوصية</label>
-//                 <Textarea 
+//                 <Textarea
 //                   placeholder="اكتب سياسة الخصوصية هنا..."
 //                   className="min-h-40 mt-1"
 //                   defaultValue="سياسة الخصوصية وحماية البيانات..."
@@ -138,6 +138,8 @@ import { Input } from "@/components/ui/input";
 import { Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { GetAllSettings, EditSetting } from "@/services/userService";
+import { useAppDispatch } from "@/redux/store";
+import { Logo, Header } from "@/redux/resourcesSlice";
 
 interface Setting {
   key: string;
@@ -151,7 +153,7 @@ export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [logoFile, setLogoFile] = useState<File | null>(null);
-
+  const dispatch = useAppDispatch();
   const fetchSettings = async () => {
     try {
       const response = await GetAllSettings();
@@ -160,6 +162,15 @@ export default function SettingsPage() {
         ...setting,
         originalValue: setting.value,
       }));
+      const logoItem = dataArray.find((item) => item.key === "logo");
+      const valueLogo = logoItem ? logoItem.value : null;
+      const site_name_ar = dataArray.find(
+        (item) => item.key === "site_name_ar"
+      );
+      const valuename_ar = site_name_ar ? site_name_ar.value : null;
+
+      dispatch(Logo(valueLogo));
+      dispatch(Header(valuename_ar));
       setSettings(settingsWithOriginal);
     } catch (error) {
       console.error("Error fetching settings:", error);
@@ -172,7 +183,6 @@ export default function SettingsPage() {
       setIsLoading(false);
     }
   };
-
 
   useEffect(() => {
     fetchSettings();
@@ -221,13 +231,11 @@ export default function SettingsPage() {
       }
 
       // إرسال البيانات إلى الخادم
-      
-      const res=await EditSetting(formData);
-      console.log("awite",res)
-      if(!res.status)
+
+      const res = await EditSetting(formData);
+      if (!res.status)
         throw new Error(res.message || "Failed to save settings");
 
-      
       // إعادة تحميل الإعدادات بعد الحفظ
       await fetchSettings();
       toast({
@@ -266,7 +274,9 @@ export default function SettingsPage() {
     <div className="container mx-auto p-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-foreground">الإعدادات العامة</h1>
-        <p className="text-muted-foreground mt-1">إعدادات النظام والتطبيق العامة</p>
+        <p className="text-muted-foreground mt-1">
+          إعدادات النظام والتطبيق العامة
+        </p>
       </div>
 
       <Card>
@@ -277,11 +287,15 @@ export default function SettingsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* اسم الموقع (عربي) */}
             <div className="space-y-2">
-              <label className="text-sm font-medium block">اسم الموقع (عربي)</label>
+              <label className="text-sm font-medium block">
+                اسم الموقع (عربي)
+              </label>
               <Input
                 value={getSettingValue("site_name_ar")}
                 onChange={(e) => {
-                  const index = settings.findIndex((s) => s.key === "site_name_ar");
+                  const index = settings.findIndex(
+                    (s) => s.key === "site_name_ar"
+                  );
                   if (index !== -1) handleSettingChange(index, e.target.value);
                 }}
               />
@@ -289,11 +303,15 @@ export default function SettingsPage() {
 
             {/* اسم الموقع (إنجليزي) */}
             <div className="space-y-2">
-              <label className="text-sm font-medium block">اسم الموقع (إنجليزي)</label>
+              <label className="text-sm font-medium block">
+                اسم الموقع (إنجليزي)
+              </label>
               <Input
                 value={getSettingValue("site_name_en")}
                 onChange={(e) => {
-                  const index = settings.findIndex((s) => s.key === "site_name_en");
+                  const index = settings.findIndex(
+                    (s) => s.key === "site_name_en"
+                  );
                   if (index !== -1) handleSettingChange(index, e.target.value);
                 }}
               />
@@ -301,11 +319,15 @@ export default function SettingsPage() {
 
             {/* البريد الإلكتروني */}
             <div className="space-y-2">
-              <label className="text-sm font-medium block">البريد الإلكتروني</label>
+              <label className="text-sm font-medium block">
+                البريد الإلكتروني
+              </label>
               <Input
                 value={getSettingValue("site_email")}
                 onChange={(e) => {
-                  const index = settings.findIndex((s) => s.key === "site_email");
+                  const index = settings.findIndex(
+                    (s) => s.key === "site_email"
+                  );
                   if (index !== -1) handleSettingChange(index, e.target.value);
                 }}
               />
@@ -313,16 +335,20 @@ export default function SettingsPage() {
 
             {/* اللغة الافتراضية */}
             <div className="space-y-2">
-              <label className="text-sm font-medium block">اللغة الافتراضية</label>
+              <label className="text-sm font-medium block">
+                اللغة الافتراضية
+              </label>
               <Input
                 value={getSettingValue("default_language")}
                 onChange={(e) => {
-                  const index = settings.findIndex((s) => s.key === "default_language");
+                  const index = settings.findIndex(
+                    (s) => s.key === "default_language"
+                  );
                   if (index !== -1) handleSettingChange(index, e.target.value);
                 }}
               />
             </div>
-  {/*   إصدار ios */}
+            {/*   إصدار ios */}
             <div className="space-y-2">
               <label className="text-sm font-medium block"> إصدار Ios</label>
               <Input
@@ -337,7 +363,10 @@ export default function SettingsPage() {
             </div>
             {/*   إصدار Android */}
             <div className="space-y-2">
-              <label className="text-sm font-medium block"> إصدار Android</label>
+              <label className="text-sm font-medium block">
+                {" "}
+                إصدار Android
+              </label>
               <Input
                 value={getSettingValue("android_app_version")}
                 onChange={(e) => {
@@ -351,11 +380,7 @@ export default function SettingsPage() {
             {/* شعار الموقع */}
             <div className="space-y-2">
               <label className="text-sm font-medium block">شعار الموقع</label>
-              <Input
-                type="file"
-                onChange={handleLogoChange}
-                accept="image/*"
-              />
+              <Input type="file" onChange={handleLogoChange} accept="image/*" />
               {!logoFile && getSettingValue("logo") && (
                 <p className="text-sm text-muted-foreground mt-1">
                   الصورة الحالية:{" "}
@@ -366,15 +391,15 @@ export default function SettingsPage() {
                   >
                     عرض
                   </a>
-
                 </p>
               )}
             </div>
-              
 
             {/* الحد الأقصى للسحب */}
             <div className="space-y-2">
-              <label className="text-sm font-medium block">الحد الأقصى للسحب</label>
+              <label className="text-sm font-medium block">
+                الحد الأقصى للسحب
+              </label>
               <Input
                 value={getSettingValue("max_withdraw_amount")}
                 onChange={(e) => {
@@ -385,10 +410,14 @@ export default function SettingsPage() {
                 }}
               />
             </div>
-          
-          <div className="w-full flex justify-center">
-              <img className="h-28 w-28" src={getSettingValue("logo")} alt="logo" />
-              </div>
+
+            <div className="w-full flex justify-center">
+              <img
+                className="h-28 w-28"
+                src={getSettingValue("logo")}
+                alt="logo"
+              />
+            </div>
           </div>
           <div className="flex justify-end mt-6">
             <Button onClick={handleSaveSettings} disabled={isSaving}>

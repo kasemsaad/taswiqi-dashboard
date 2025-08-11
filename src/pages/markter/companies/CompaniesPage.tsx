@@ -46,8 +46,6 @@ export default function MarketersPage() {
 
   const fetchBrandData = async () => {
     try {
-      console.log("statusFilter:", statusFilter);
-      console.log("categoryFilter:", categoryFilter);
       setLoading(true);
       const response = await GetBrands({
         page,
@@ -247,9 +245,8 @@ export default function MarketersPage() {
       <div className="md:flex items-center justify-between">
         <div>
           <h1 className="text-xl md:text-3xl font-bold text-foreground">إدارة الشركات</h1>
-          <p className="text-muted-foreground mt-1">
             قائمة بجميع الشركات الشريكة في التطبيق
-          </p>
+          
         </div>
         <Link to="/companies/add" className="">
           <Button>
@@ -349,8 +346,6 @@ export default function MarketersPage() {
                     {category.name}
                   </SelectItem>
                 ))}
-                {/* <SelectItem value="true">نشط</SelectItem>
-                <SelectItem value="false">غير نشط</SelectItem> */}
               </SelectContent>
             </Select>
           </div>

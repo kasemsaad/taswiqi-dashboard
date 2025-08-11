@@ -129,7 +129,6 @@ export default function MarketerProfilePage() {
       const Customer = await GetCustomersById(id);
       const CustomerData = Customer.data;
       setCustomer(CustomerData);
-      console.log("Customer Data:", CustomerData);
     } catch (error) {
       console.error("Error fetching center data:", error);
     }
@@ -142,7 +141,6 @@ export default function MarketerProfilePage() {
       setReferral(ReferralData);
       setPage(Referralpage.meta.current_page);
       setPerPage(Referralpage.meta.per_page);
-      console.log("Referral  Data:", ReferralData);
     } catch (error) {
       console.error("Error fetching center data:", error);
     }
@@ -155,7 +153,6 @@ export default function MarketerProfilePage() {
       setDiscountCode(DiscountCodeData);
       setPage(DiscountCodepage.meta.current_page);
       setPerPage(DiscountCodepage.meta.per_page);
-      console.log("Discount Code Data:", DiscountCodeData);
     } catch (error) {
       console.error("Error fetching center data:", error);
     }
@@ -168,7 +165,6 @@ export default function MarketerProfilePage() {
       setBrand(BrandData);
       setPage(Brandpage.meta.current_page);
       setPerPage(Brandpage.meta.per_page);
-      console.log("Brand Data:", BrandData);
     } catch (error) {
       console.error("Error fetching center data:", error);
     }
@@ -181,7 +177,6 @@ export default function MarketerProfilePage() {
       setWalletRequests(WalletRequestsData);
       setPage(WalletRequestsPage.meta.current_page);
       setPerPage(WalletRequestsPage.meta.per_page);
-      console.log("Wallet Requests Data:", WalletRequestsData);
     } catch (error) {
       console.error("Error fetching center data:", error);
     }
@@ -194,7 +189,6 @@ export default function MarketerProfilePage() {
       setBlock(BlockData);
       setPage(BlockPage.meta.current_page);
       setPerPage(BlockPage.meta.per_page);
-      console.log("Block Data:", BlockData);
     } catch (error) {
       console.error("Error fetching center data:", error);
     }
@@ -528,7 +522,6 @@ export default function MarketerProfilePage() {
     try {
       // Show toast
       await PushNotification(notificationPayload);
-      console.log("Sending notification:", notificationPayload);
       toast({
         title: "تم إرسال الإشعار",
         description: `تم إرسال الإشعار إلى ${Customer?.name}`,

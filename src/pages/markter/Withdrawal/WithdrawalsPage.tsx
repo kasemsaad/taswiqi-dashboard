@@ -147,7 +147,6 @@ export default function WithdrawalsPage() {
 
   const handleStatusChange = (status: string) => {
     if (selectedWithdrawal) {
-      console.log(`Changing status to: ${status}`, { withdrawal: selectedWithdrawal });
       // Handle status change logic
       setIsProcessDialogOpen(false);
     }

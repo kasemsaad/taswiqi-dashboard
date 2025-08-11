@@ -105,7 +105,6 @@ export default function ReportsPage() {
   ];
 
   // const handleExport = () => {
-  //   console.log("Exporting report with filters:", { timeFilter });
   // };
 
   return (

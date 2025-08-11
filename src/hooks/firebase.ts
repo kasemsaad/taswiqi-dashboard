@@ -25,7 +25,6 @@ export const generateFCMToken = async (): Promise<string | undefined> => {
       const token = await getToken(messaging, {
         vapidKey: "BGD6WhupkHIlzZGsxgyp5lXCsUOLe7DogNpUbmerkOf47ZR4afxNVAT0vKsSlm-V8RyTKup1gKaV2sxGjLcBa5k" // استبدله بمفتاح VAPID الحقيقي
       });
-      console.log("FCM Token111:", token);
       if (token) {
         localStorage.setItem("fcmToken", token);
         return token;

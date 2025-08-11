@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
-import { Outlet, useNavigate, NavLink } from "react-router-dom";
+import { Outlet, useNavigate, NavLink, Link } from "react-router-dom";
 import { Role } from "../../redux/resourcesSlice";
 // import logo from "@/assets/logo.svg";
+import { selectHeader, selectLogo } from "@/redux/resourcesSlice";
+
 import {
   Users,
   Building,
@@ -23,6 +25,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -39,7 +42,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { useAppDispatch } from "@/redux/store";
+import { useAppDispatch, useAppSelector } from "@/redux/store";
 import { messaging, onMessage } from "@/hooks/firebase copy";
 import { toast } from "sonner";
 import {
@@ -47,6 +50,7 @@ import {
   GetNotificationsUnReadedCount,
   GetAllSettings,
 } from "@/services/userService";
+import { Line } from "recharts";
 
 interface Notification {
   id: number;
@@ -94,7 +98,8 @@ export default function DashboardLayout() {
   );
   const [logo, setlogo] = useState("");
   const [Name, setName] = useState("");
-
+  const logoState = useAppSelector(selectLogo);
+  const headerState = useAppSelector(selectHeader);
   const [pagination, setPagination] = useState({
     currentPage: 1,
     perPage: 5,
@@ -123,14 +128,16 @@ export default function DashboardLayout() {
       // Find the "logo" key and get its value
       const logoItem = dataArray.find((item) => item.key === "logo");
       const valueLogo = logoItem ? logoItem.value : null;
-      const site_name_ar = dataArray.find((item) => item.key === "site_name_ar");
+      const site_name_ar = dataArray.find(
+        (item) => item.key === "site_name_ar"
+      );
       const valuename_ar = site_name_ar ? site_name_ar.value : null;
 
       setlogo(valueLogo);
       setName(valuename_ar);
     } catch (error) {
       console.error("Error fetching settings:", error);
-    } 
+    }
   };
   const fetchNotifications = async (page = 1, perPage = 5) => {
     try {
@@ -140,15 +147,19 @@ export default function DashboardLayout() {
       });
 
       if (response && response.data) {
-        const formattedNotifications = response.data.map((notification: any) => ({
-          id: notification.id,
-          title: notification.title,
-          body: notification.body,
-          time: notification.created_at ?? "",
-          type: notification.type,
-          unread: (notification as any).read_at === undefined || (notification as any).read_at === null,
-          image: notification.image,
-        }));
+        const formattedNotifications = response.data.map(
+          (notification: any) => ({
+            id: notification.id,
+            title: notification.title,
+            body: notification.body,
+            time: notification.created_at ?? "",
+            type: notification.type,
+            unread:
+              (notification as any).read_at === undefined ||
+              (notification as any).read_at === null,
+            image: notification.image,
+          })
+        );
 
         setLiveNotifications(formattedNotifications);
         setPagination({
@@ -247,10 +258,14 @@ export default function DashboardLayout() {
             </Button>
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="h-8 w-8 sm:h-10 sm:w-10">
-                <img src={logo} alt="logo" className="w-full h-full" />
+                <img
+                  src={`${logoState ? logoState : logo}`}
+                  alt="logo"
+                  className="w-full h-full"
+                />
               </div>
               <h1 className="text-lg sm:text-xl font-bold whitespace-nowrap">
-                {Name} - لوحة التحكم
+                {headerState ? headerState : Name} - لوحة التحكم
               </h1>
             </div>
           </div>
@@ -414,8 +429,11 @@ export default function DashboardLayout() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem>الملف الشخصي</DropdownMenuItem>
-                <DropdownMenuItem>الإعدادات</DropdownMenuItem>
+                {/* <DropdownMenuItem>الملف الشخصي</DropdownMenuItem> */}
+
+                <Link to="/settings"> <DropdownMenuItem>
+                 الإعدادات 
+                </DropdownMenuItem></Link>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="text-destructive"

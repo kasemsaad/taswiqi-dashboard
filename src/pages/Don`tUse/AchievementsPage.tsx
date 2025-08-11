@@ -186,7 +186,6 @@ export default function AchievementsPage() {
 
   const handleSave = () => {
     // هنا يتم حفظ البيانات
-    console.log(editingBadge ? "تعديل الشارة:" : "إضافة شارة جديدة:", formData);
     setIsDialogOpen(false);
   };
 

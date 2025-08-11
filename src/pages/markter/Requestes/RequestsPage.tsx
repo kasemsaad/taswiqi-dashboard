@@ -47,8 +47,6 @@ export default function MarketersPage() {
 
   const fetchRequestData = async () => {
     try {
-      // console.log("statusFilter:", statusFilter);
-      // console.log("categoryFilter:", categoryFilter);
       setLoading(true);
       const response = await GetRequests({
         page,

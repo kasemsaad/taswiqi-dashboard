@@ -36,7 +36,6 @@ export default function MarketersPage() {
 
   const fetchCustomerData = async () => {
     try {
-      console.log("statusFilter:", statusFilter);
       setLoading(true);
       const response = await GetCustomers({
         page,
