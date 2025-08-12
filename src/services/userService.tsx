@@ -496,6 +496,10 @@ export const CreateBlock = async (sendData: object): Promise<UsersServices> => {
   const response = await Api.post<UsersServices>(`user-blocks`, sendData);
   return response.data;
 };
+export const CreateBlockBrand= async (sendData: object): Promise<UsersServices> => {
+  const response = await Api.post<UsersServices>(`brand-blocks`, sendData);
+  return response.data;
+};
 export const PushNotification = async (
   sendData: object
 ): Promise<UsersServices> => {

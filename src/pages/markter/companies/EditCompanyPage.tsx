@@ -17,10 +17,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { ArrowRight, Save } from "lucide-react";
+import { ArrowRight, Save, Ban } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
-import { GetAllCountries, GetAllCategories, EditBrands, GetBrandById } from "@/services/userService";
+import { GetAllCountries, GetAllCategories, EditBrands, GetBrandById, CreateBlockBrand } from "@/services/userService";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import FileUploadFieldblock from "@/components/ui/FileUploadField copy";
 
 const validationSchema = Yup.object().shape({
   name: Yup.object()
@@ -51,8 +61,21 @@ const validationSchema = Yup.object().shape({
       return /^\d{1,14}$/.test(value);
     }),
   code: Yup.string().required("الكود مطلوب"),
-  // logo: Yup.mixed(),
 });
+
+type Brand = {
+  name: { ar: string; en: string };
+  description: { ar: string; en: string };
+  logo?: string;
+  category_id: string;
+  countries?: { country_id: number }[];
+  google_drive_url?: string;
+  email?: string;
+  phone?: string;
+  code?: string;
+  status?: string;
+  is_active?:boolean;
+};
 
 const EditCompanyPage = () => {
   const navigate = useNavigate();
@@ -60,21 +83,12 @@ const EditCompanyPage = () => {
   const [activeLanguage, setActiveLanguage] = useState<"ar" | "en">("ar");
   const [CategoriesRequests, setCategoriesRequests] = useState<any>(null);
   const [CountriesRequests, setCountriesRequests] = useState<any>(null);
-  type Brand = {
-    name: { ar: string; en: string };
-    description: { ar: string; en: string };
-    logo?: string;
-    category_id: string;
-    countries?: { country_id: number }[];
-    google_drive_url?: string;
-    email?: string;
-    phone?: string;
-    code?: string;
-  };
-  
   const [BrandData, setBrandData] = useState<Brand | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { id } = useParams();
+  const [isBlockDialogOpen, setIsBlockDialogOpen] = useState(false);
+  const [reason, setReason] = useState("");
+  const [images, setImages] = useState<{ image: File }[]>([]);
 
   const fetchCategories = async () => {
     try {
@@ -99,7 +113,6 @@ const EditCompanyPage = () => {
       const response = await GetBrandById(id);
       setBrandData(response.data as Brand);
       
-      // Initialize form values with fetched data
       if (response.data) {
         const brand = response.data as Brand;
         formik.setValues({
@@ -122,6 +135,48 @@ const EditCompanyPage = () => {
       }
     } catch (error) {
       console.error("Error fetching brand data:", error);
+    }
+  };
+
+  const handleBlockBrand = async (brandId: string, currentStatus: boolean) => {
+    try {
+      const type = !currentStatus ? "unblock" : "block";
+      const formData = new FormData();
+      
+      formData.append("brand_id", brandId);
+      formData.append("type", type);
+      formData.append("reason", reason);
+      
+      // Ensure we only append images if they exist
+      if (images && images.length > 0) {
+        images.forEach((img, index) => {
+          if (img.image) {
+            formData.append(`images[${index}][image]`, img.image);
+          }
+        });
+      }
+
+      await CreateBlockBrand(formData);
+
+      toast({
+        title: "تم بنجاح",
+        description: currentStatus ? "تم حظر العلامة التجارية" : "تم إلغاء حظر العلامة التجارية",
+        variant: "success",
+      });
+
+      if (id) {
+        await fetchBrandData(id);
+      }
+      setIsBlockDialogOpen(false);
+      setReason("");
+      setImages([]);
+    } catch (error) {
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ أثناء محاولة حظر/إلغاء حظر العلامة التجارية",
+        variant: "destructive",
+      });
+      console.error("Error blocking/unblocking brand:", error);
     }
   };
 
@@ -165,7 +220,6 @@ const EditCompanyPage = () => {
         formData.append("phone", values.phone);
         formData.append("code", values.code);
         formData.append("_method", "put");
-      
 
         await EditBrands(String(id), formData);
 
@@ -203,11 +257,9 @@ const EditCompanyPage = () => {
     }
   }, [id]);
 
-
   if (!BrandData) {
     return <div className="container mx-auto p-6">جاري التحميل...</div>;
   }
-
 
   return (
     <div className="container mx-auto p-6 max-w-4xl space-y-6">
@@ -494,6 +546,87 @@ const EditCompanyPage = () => {
             </div>
           </CardContent>
         </Card>
+
+        <Dialog open={isBlockDialogOpen} onOpenChange={setIsBlockDialogOpen}>
+          <DialogTrigger asChild>
+            <Button
+              variant={!BrandData.is_active ? "success" : "destructive"}
+              className="gap-2"
+            >
+              <Ban className="h-4 w-4" />
+              {!BrandData.is_active ? "إلغاء الحظر" : "حظر  "}
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="text-right">
+                {BrandData.is_active
+                  ? "حظر العلامة التجارية"
+                  : "إلغاء حظر العلامة التجارية"}
+              </DialogTitle>
+              <DialogDescription className="text-right">
+                {!BrandData.is_active
+                  ? `هل أنت متأكد من أنك تريد إلغاء حظر ${BrandData.name.ar}؟ هذا الإجراء سيمنحهم الوصول إلى العلامة التجارية.`
+                  : `هل أنت متأكد من أنك تريد حظر ${BrandData.name.ar}؟ هذا الإجراء سيمنع الوصول إلى العلامة التجارية.`}
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="reason" className="text-right">
+                  السبب (مطلوب)
+                </Label>
+                <Textarea
+                  id="reason"
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+placeholder={BrandData.is_active ? "أدخل سبب الحظر" : "أدخل سبب الغاء الحظر"}
+                  className="min-h-[100px]"
+                />
+              </div>
+
+              <div className="space-y-2">
+                {/* Use the new SimpleFileUploadField here */}
+                <FileUploadFieldblock
+                  label=""
+                  multiple
+                  onFilesSelected={(files) => {
+                    const newImages = files.map(file => ({ image: file }));
+                    setImages(newImages);
+                  }}
+                />
+                {images.length > 0 && (
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-600">الصور المحددة:</p>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      {images.map((img, index) => (
+                        <div key={index} className="text-xs text-gray-500">
+                          {img.image.name}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <DialogFooter className="gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setIsBlockDialogOpen(false)}
+              >
+                إلغاء
+              </Button>
+              <Button
+                variant={!BrandData.is_active ? "success" : "destructive"}
+                onClick={() => handleBlockBrand(id as string, BrandData.is_active ??false)}
+                disabled={!reason.trim()}
+              >
+                {!BrandData.is_active? "إلغاء الحظر" : "تأكيد الحظر"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <Separator />
 

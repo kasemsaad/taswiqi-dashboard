@@ -700,7 +700,7 @@ export default function MarketerProfilePage() {
             </DialogHeader>
             <div className="mb-4">
               <Formik initialValues={{ images_upload: [] }} onSubmit={() => {}}>
-                {() => (
+                 {({ setFieldValue }) => (
                   <Form className="space-y-4">
                     <input
                       type="text"
@@ -731,14 +731,18 @@ export default function MarketerProfilePage() {
                       onChange={(e) => setbodyEn(e.target.value)}
                       required
                     />
-                    <FileUploadField
-                      label=""
-                      name="images_upload"
-                      // multiple
-                      onFilesSelected={(files: File[]) => {
-                        setimage(files[0]); // تحديث الـ state المحلي
-                      }}
-                    />
+                  <FileUploadField
+                        label=""
+                        name="images_upload"
+                        multiple
+                        onFilesSelected={(files) => {
+                                    const firstImage = { image: files[0] }; // only index 0
+
+                          // setImages(newImages);
+                          setimage(firstImage.image);
+                          setFieldValue("images_upload", files); // Update Formik state
+                        }}
+                      />
                   </Form>
                 )}
               </Formik>

@@ -118,6 +118,8 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
 
         {field.value && !maskImage && (
           <div className="text-sm text-green-600 mt-2">
+          {field.value && !maskImage && (
+          <div className="text-sm text-green-600 mt-2">
             {Array.isArray(field.value) ? (
               <div>
                 <p>Selected {field.value.length} files:</p>
@@ -130,6 +132,8 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
             ) : (
               typeof field.value === 'object' && <p>Selected: {field.value.name}</p>
             )}
+          </div>
+        )}
           </div>
         )}
       </div>
