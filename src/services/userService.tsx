@@ -77,7 +77,7 @@ export const GetAllpadges = async (
   });
   return response.data;
 };
-export const deleteChate= async (id: string): Promise<UsersServices> => {
+export const deleteChate = async (id: string): Promise<UsersServices> => {
   const response = await Api.delete<UsersServices>(`chat/delete-chat/${id}`);
   return response.data;
 };
@@ -189,7 +189,6 @@ export const GetAllNotifications = async (
   }
 };
 
-
 export const GetAllReports = async (
   params?: GetParams
 ): Promise<UsersServices> => {
@@ -210,25 +209,17 @@ export const GetMesaages = async (
   );
   return response.data;
 };
-export const SendMessage= async (
-  sendData: object
-): Promise<UsersServices> => {
-  const response = await Api.post<UsersServices>(
-    `chat/send-message`,
-    sendData
-  );
+export const SendMessage = async (sendData: object): Promise<UsersServices> => {
+  const response = await Api.post<UsersServices>(`chat/send-message`, sendData);
   return response.data;
 };
 export const Getchats = async (
   // id: string,
   params?: GetParams
 ): Promise<UsersServices> => {
-  const response = await Api.get<UsersServices>(
-    `chat/get-chats`,
-    {
-      params,
-    }
-  );
+  const response = await Api.get<UsersServices>(`chat/get-chats`, {
+    params,
+  });
   return response.data;
 };
 export const GetAllCustomersNotMeta = async (
@@ -447,17 +438,23 @@ export const GetAllCodes = async (
 export const GetAllCodesNotRreserved = async (
   params?: GetParams
 ): Promise<UsersServices> => {
-  const response = await Api.get<UsersServices>(`discount-code/get-not-reserved`, {
-    params,
-  });
+  const response = await Api.get<UsersServices>(
+    `discount-code/get-not-reserved`,
+    {
+      params,
+    }
+  );
   return response.data;
 };
 export const GetAllReferralNotRreserved = async (
   params?: GetParams
 ): Promise<UsersServices> => {
-  const response = await Api.get<UsersServices>(`referral-link/get-not-reserved`, {
-    params,
-  });
+  const response = await Api.get<UsersServices>(
+    `referral-link/get-not-reserved`,
+    {
+      params,
+    }
+  );
   return response.data;
 };
 
@@ -496,8 +493,69 @@ export const CreateBlock = async (sendData: object): Promise<UsersServices> => {
   const response = await Api.post<UsersServices>(`user-blocks`, sendData);
   return response.data;
 };
-export const CreateBlockBrand= async (sendData: object): Promise<UsersServices> => {
+export const CreateBlockBrand = async (
+  sendData: object
+): Promise<UsersServices> => {
   const response = await Api.post<UsersServices>(`brand-blocks`, sendData);
+  return response.data;
+};
+export const CreateCategory = async (
+  sendData: object
+): Promise<UsersServices> => {
+  const response = await Api.post<UsersServices>(`categories`, sendData);
+  return response.data;
+};
+export const EditCategory = async (
+  id: string,
+  sendData: object
+): Promise<UsersServices> => {
+  const response = await Api.post<UsersServices>(`categories/${id}`, sendData);
+  return response.data;
+};
+export const GetCategoryById = async (id: string): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>(`categories/${id}`);
+  return response.data;
+};
+export const GetCategories = async (
+  params?: GetParams
+): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>("categories", {
+    params,
+  });
+  return response.data;
+};
+export const DeleteCategory = async (id: string): Promise<UsersServices> => {
+  const response = await Api.delete<UsersServices>(`categories/${id}`);
+  return response.data;
+};
+export const GetCountries = async (
+  params?: GetParams
+): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>("countries", {
+    params,
+  });
+  return response.data;
+};
+export const CreateCountry = async (
+  sendData: object
+): Promise<UsersServices> => {
+  const response = await Api.post<UsersServices>(`countries`, sendData);
+  return response.data;
+};
+export const EditCountry = async (
+  id: string,
+  sendData: object
+): Promise<UsersServices> => {
+  const response = await Api.post<UsersServices>(`countries/${id}`, sendData);
+  return response.data;
+};
+export const GetCountryById = async (id: string): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>(`countries/${id}`);
+  return response.data;
+};
+
+export const DeleteCountry = async (id: string): Promise<UsersServices> => {
+  const response = await Api.delete<UsersServices>(`countries/${id}`);
   return response.data;
 };
 export const PushNotification = async (
@@ -559,13 +617,20 @@ export const GetAllQr = async (params?: GetParams): Promise<UsersServices> => {
   });
   return response.data;
 };
-export const GetNotificationsUnReadedCount = async (params?: GetParams): Promise<UsersServices> => {
-  const response = await Api.get<UsersServices>("notifications/get-unreaded-count", {
-    params,
-  });
+export const GetNotificationsUnReadedCount = async (
+  params?: GetParams
+): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>(
+    "notifications/get-unreaded-count",
+    {
+      params,
+    }
+  );
   return response.data;
 };
-export const DeleteNotificationyId = async (id: string): Promise<UsersServices> => {
+export const DeleteNotificationyId = async (
+  id: string
+): Promise<UsersServices> => {
   const response = await Api.delete<UsersServices>(
     `notifications/delete/${id}`
   );

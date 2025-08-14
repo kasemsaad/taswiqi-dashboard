@@ -20,12 +20,14 @@ import { Role } from "../../redux/resourcesSlice";
 import { useAppDispatch } from "../../redux/store";
 import { ProgressBar } from "primereact/progressbar";
 import { generateFCMToken } from "@/hooks/firebase";
+// import { get } from "http";
 
 const Login = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const toast = useRef<Toast>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [fcm, setfcm] = useState("");
 
   const getDeviceType = () => {
     const userAgent = navigator.userAgent;
@@ -62,7 +64,7 @@ const Login = () => {
         email: values.email,
         password: values.password,
         deviceType: values.deviceType,
-        fcmToken: values.fcmToken,
+        fcmToken: fcm,
       });
 
       const { role, image, name, id } = response.data.data.user;
@@ -113,7 +115,25 @@ const Login = () => {
       setIsLoading(false);
     }
   };
-
+  useEffect(() => {
+    const fetchToken = async () => {
+      const token = await generateFCMToken();
+      console.log("fcm", token);
+      
+        localStorage.setItem("fcmToken", token??"");
+        // setFieldValue("fcmToken", token);
+        setTimeout(
+          () => {
+            // setfcm(token??"");
+            setfcm(localStorage.getItem("fcmToken") || "not found");
+          },
+          1000 // This should be the second argument, not in an array
+        );
+        console.log("fcmsum", token);
+      
+    };
+    fetchToken();
+  }, []);
   return (
     <div
       id="login"
@@ -131,18 +151,7 @@ const Login = () => {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ isSubmitting, setFieldValue }) => {
-            useEffect(() => {
-              const fetchToken = async () => {
-                const token = await generateFCMToken();
-                if (token) {
-                  localStorage.setItem("fcmToken", token);
-                  setFieldValue("fcmToken", token);
-                }
-              };
-              fetchToken();
-            }, [setFieldValue]);
-
+          {({ isSubmitting }) => {
             return (
               <Form
                 className={`flex flex-col gap-7 ${
@@ -179,23 +188,31 @@ const Login = () => {
                   >
                     كلمة المرور
                   </label>
-                <Field name="password" type="password">
-  {({ field, form }: { field: FieldInputProps<string>; form: any }) => (
-    <Password
-    toggleMask
-      id="password"
-      type="password"
-      value={field.value || ""}
-      onChange={(e) => form.setFieldValue(field.name, e.target.value)}
-      feedback={false}
-      placeholder="كلمة المرور"
-      aria-label="Password"
-      disabled={isLoading}
-      className="w-full"
-      inputClassName="w-full ps-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-    />
-  )}
-</Field>
+                  <Field name="password" type="password">
+                    {({
+                      field,
+                      form,
+                    }: {
+                      field: FieldInputProps<string>;
+                      form: any;
+                    }) => (
+                      <Password
+                        toggleMask
+                        id="password"
+                        type="password"
+                        value={field.value || ""}
+                        onChange={(e) =>
+                          form.setFieldValue(field.name, e.target.value)
+                        }
+                        feedback={false}
+                        placeholder="كلمة المرور"
+                        aria-label="Password"
+                        disabled={isLoading}
+                        className="w-full"
+                        inputClassName="w-full ps-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                      />
+                    )}
+                  </Field>
 
                   <ErrorMessage
                     name="password"
@@ -206,7 +223,11 @@ const Login = () => {
 
                 {/* Hidden fields */}
                 <Field type="hidden" name="deviceType" />
-                <Field type="hidden" name="fcmToken" />
+                <Field
+                  type="hidden"
+                  name="fcmToken"
+                  value={localStorage.getItem("fcmToken")}
+                />
 
                 <Button
                   type="submit"

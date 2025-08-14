@@ -70,6 +70,7 @@ interface GeneralTableProps {
   className?: string;
   pagination?: {
     page: number;
+    lastPage?: number;
     perPage: number;
     total: number;
     onPageChange: (page: number) => void;

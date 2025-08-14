@@ -8,6 +8,12 @@ import ReportsPage from "./pages/markter/Reports/ReportsPage";
 import DetailedReportsPage from "./pages/Don`tUse/DetailedReportsPage";
 import MarketersPage from "./pages/markter/Markter/MarketersPage";
 import MarketerProfilePage from "./pages/markter/Markter/MarketerProfilePage";
+import Categories from "./pages/markter/Category/CategoryPage";
+import AddCategory from "./pages/markter/Category/AddCategoryPage";
+import EditCategory from "./pages/markter/Category/EditCategoryPage";
+import Countries from "./pages/markter/Countries/CountryPage";
+import AddCountry from "./pages/markter/Countries/AddCountryPage";
+import EditCountry from "./pages/markter/Countries/EditCountryPage";
 import LinksCodes from "./pages/markter/ReferralCode/LinksCodes";
 import RequsetWithdrawal from "./pages/markter/Withdrawal/RequsetWithdrawal";
 import RequsetIinfo from "./pages/markter/Withdrawal/InfoRequest";
@@ -82,10 +88,21 @@ const App = () => (
             />
             <Route path="linksCodes" element={<LinksCodes />} />
             <Route path="LinksCodes/addReferral" element={<AddReferral />} />
-            <Route path="LinksCodes/addReferral" element={<AddReferral />} />
             <Route
               path="LinksCodes/editReferral/:id"
               element={<EditReferral />}
+            />
+            <Route path="categories" element={<Categories />} />
+            <Route path="categories/add" element={<AddCategory />} />
+            <Route
+              path="categories/edit/:id"
+              element={<EditCategory />}
+            />
+            <Route path="countries" element={<Countries />} />
+            <Route path="countries/add" element={<AddCountry />} />
+            <Route
+              path="countries/edit/:id"
+              element={<EditCountry />}
             />
             <Route path="LinksCodes/addCode" element={<AddCode />} />
             <Route path="LinksCodes/editCode/:id" element={<EditCode />} />

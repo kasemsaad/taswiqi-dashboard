@@ -25,6 +25,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Trash2,
+  Container ,
+  ChartColumnStacked 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -73,6 +75,8 @@ const navigation = [
   { name: "الشارات والإنجازات", href: "/badges", icon: Award },
   { name: "التحقق من الهوية", href: "/verification", icon: Shield },
   { name: "الإشعارات", href: "/notification", icon: Megaphone },
+  { name: "الدول", href: "/countries", icon: Container },
+  { name: "الوصف", href: "/categories", icon: ChartColumnStacked },
   { name: "الدعم", href: "/support", icon: HeadphonesIcon },
   { name: "واتساب", href: "/qr", icon: ScanQrCode },
   { name: "الإعدادات العامة", href: "/settings", icon: Settings },
