@@ -435,22 +435,22 @@ export const GetAllCodes = async (
   });
   return response.data;
 };
-export const GetAllCodesNotRreserved = async (
+export const GetAllCodesNotRreserved = async (id:string,
   params?: GetParams
 ): Promise<UsersServices> => {
   const response = await Api.get<UsersServices>(
-    `discount-code/get-not-reserved`,
+    `discount-code/get-not-reserved/${id}`,
     {
       params,
     }
   );
   return response.data;
 };
-export const GetAllReferralNotRreserved = async (
+export const GetAllReferralNotRreserved = async (id:string,
   params?: GetParams
 ): Promise<UsersServices> => {
   const response = await Api.get<UsersServices>(
-    `referral-link/get-not-reserved`,
+    `referral-link/get-not-reserved/${id}`,
     {
       params,
     }

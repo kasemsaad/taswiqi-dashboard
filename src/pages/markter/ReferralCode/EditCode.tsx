@@ -70,7 +70,14 @@ const EditReferralPage = () => {
       console.error("Error fetching referral link:", error);
     }
   };
-
+ const handleBrandChange = (brandId: string) => {
+    formik.setFieldValue("brand_id", brandId);
+    
+    const selectedBrand = brands.find(brand => brand.id.toString() === brandId);
+    if (selectedBrand) {
+      formik.setFieldValue("earning_precentage", selectedBrand.default_code_earning || "");
+    }
+  };
   const formik = useFormik({
     initialValues: {
       brand_id: "",
@@ -141,15 +148,11 @@ const EditReferralPage = () => {
          
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
+               <div className="space-y-2">
                 <Label htmlFor="brand_id">الشركة *</Label>
                 <Select
-                
                   value={formik.values.brand_id}
-                  onValueChange={(value) => {
-                    formik.setFieldValue("brand_id", value);
-                    formik.setFieldTouched("brand_id", true, false);
-                  }}
+                  onValueChange={handleBrandChange}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="اختر الشركة" />
@@ -189,6 +192,7 @@ const EditReferralPage = () => {
                     </div>
                   )}
               </div>
+              
 
               <div className="space-y-2">
                 <Label htmlFor="code">كود الخصم *</Label>

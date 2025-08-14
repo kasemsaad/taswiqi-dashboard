@@ -20,7 +20,11 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowRight, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
-import { GetAllCountries,GetAllCategories, AddBrands } from "@/services/userService";
+import {
+  GetAllCountries,
+  GetAllCategories,
+  AddBrands,
+} from "@/services/userService";
 
 // interface Country {
 //   id: number;
@@ -62,13 +66,15 @@ const validationSchema = Yup.object().shape({
     }),
   code: Yup.string().required("الكود مطلوب"),
   logo: Yup.mixed().required("شعار الشركة مطلوب"),
+  default_link_earning: Yup.number().required(" رقم العمولة مطلوب"),
+  default_code_earning: Yup.number().required(" رقم العمولة مطلوب"),
 });
 
 const AddCompanyPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [activeLanguage, setActiveLanguage] = useState<"ar" | "en">("ar");
- const [CategoriesRequests, setCategoriesRequests] = useState<any>(null);
+  const [CategoriesRequests, setCategoriesRequests] = useState<any>(null);
   const [CountriesRequests, setCountriesRequests] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -105,6 +111,8 @@ const AddCompanyPage = () => {
       google_drive_url: "",
       email: "",
       phone: "",
+      default_link_earning:null as string | null ,
+      default_code_earning: null as string | null ,
       code: "",
     },
     validationSchema,
@@ -119,9 +127,9 @@ const AddCompanyPage = () => {
         formData.append("description[en]", values.description.en);
         if (values.logo) formData.append("logo", values.logo);
         formData.append("category_id", values.category_id);
-        
+
         // Format countries as API expects
-        values.countries.forEach(countryId => {
+        values.countries.forEach((countryId) => {
           formData.append("countries[][country_id]", countryId.toString());
         });
 
@@ -129,13 +137,15 @@ const AddCompanyPage = () => {
         formData.append("email", values.email);
         formData.append("phone", values.phone);
         formData.append("code", values.code);
+        formData.append("default_code_earning", values.default_code_earning ?? "");
+        formData.append("default_link_earning", values.default_link_earning ?? "");
 
         await AddBrands(formData);
 
         toast({
           title: "تم بنجاح",
           description: "تم إضافة الشركة بنجاح",
-        variant: "success",
+          variant: "success",
         });
         navigate("/companies");
       } catch (error) {
@@ -153,7 +163,7 @@ const AddCompanyPage = () => {
 
   const handleCountryToggle = (countryId: number) => {
     const newCountries = formik.values.countries.includes(countryId)
-      ? formik.values.countries.filter(id => id !== countryId)
+      ? formik.values.countries.filter((id) => id !== countryId)
       : [...formik.values.countries, countryId];
     formik.setFieldValue("countries", newCountries);
   };
@@ -236,14 +246,19 @@ const AddCompanyPage = () => {
                   accept="image/*"
                   onChange={(event) => {
                     if (event.currentTarget.files) {
-                      formik.setFieldValue("logo", event.currentTarget.files[0]);
+                      formik.setFieldValue(
+                        "logo",
+                        event.currentTarget.files[0]
+                      );
                     }
                   }}
                   onBlur={formik.handleBlur}
                   className="file:ml-2 file:rounded-md file:border-0 file:bg-primary file:text-primary-foreground"
                 />
                 {formik.touched.logo && formik.errors.logo && (
-                  <div className="text-sm text-red-500">{formik.errors.logo}</div>
+                  <div className="text-sm text-red-500">
+                    {formik.errors.logo}
+                  </div>
                 )}
               </div>
             </div>
@@ -418,6 +433,52 @@ const AddCompanyPage = () => {
                 </div>
               </div>
             </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="default_link_earning">
+                  {" "}
+                  للروابط العمولة الافتراضية *
+                </Label>
+                <Input
+                  id="default_link_earning"
+                  name="default_link_earning"
+                  type="number"
+                  value={formik.values.default_link_earning || ""}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  placeholder="أدخل  العموله الافتراضيه للروابط"
+                />
+                {formik.touched.default_link_earning &&
+                  formik.errors.default_link_earning && (
+                    <div className="text-sm text-red-500">
+                      {formik.errors.default_link_earning}
+                    </div>
+                  )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="default_link_earning">
+                  {" "}
+                  للاكواد العمولة الافتراضية *
+                </Label>
+                <div className="flex flex-col">
+                  <Input
+                    id="default_code_earning"
+                    name="default_code_earning"
+                    type="number"
+                    value={formik.values.default_code_earning || ""}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    placeholder="أدخل  العموله الافتراضيه للاكواد"
+                  />
+                  {formik.touched.default_code_earning &&
+                    formik.errors.default_code_earning && (
+                      <div className="text-sm text-red-500">
+                        {formik.errors.default_code_earning}
+                      </div>
+                    )}
+                </div>
+              </div>
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="google_drive_url">رابط جوجل درايف</Label>
@@ -450,11 +511,7 @@ const AddCompanyPage = () => {
           >
             إلغاء
           </Button>
-          <Button
-            type="submit"
-            className="gap-2"
-            disabled={isSubmitting}
-          >
+          <Button type="submit" className="gap-2" disabled={isSubmitting}>
             <Save className="w-4 h-4" />
             حفظ الشركة
           </Button>

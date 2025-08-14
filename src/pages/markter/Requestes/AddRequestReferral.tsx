@@ -32,6 +32,7 @@ const AddReferralPage = () => {
   const { toast } = useToast();
   const { id } = useParams();
   const [codes, setCodeData] = useState<any[]>([]);
+  const [idbrand, setbrandId] = useState<any>(null);
   const [requestData, setRequestData] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -53,6 +54,8 @@ const AddReferralPage = () => {
     try {
       const response = await GetReferralRequestById(id);
       setRequestData(response.data);
+      const brand_id = (response.data as any).id
+      setbrandId(brand_id)
     } catch (error) {
       console.error("Error fetching request data:", error);
       toast({
@@ -65,9 +68,9 @@ const AddReferralPage = () => {
     }
   };
 
-  const fetchCodeList = async (search: string) => {
+  const fetchCodeList = async (id:string,search: string) => {
     try {
-      const response = await GetAllReferralNotRreserved({
+      const response = await GetAllReferralNotRreserved(id,{
         searchTerm: search || undefined,
       });
       const CodeData = Array.isArray(response?.data) ? response.data : [];
@@ -116,11 +119,11 @@ const AddReferralPage = () => {
     if (id) {
       fetchRequestData(id);
     }
-    fetchCodeList("");
+    fetchCodeList(idbrand,"");
   }, [id]);
-
+  
   useEffect(() => {
-    fetchCodeList(debouncedSearchTerm);
+    fetchCodeList(idbrand, debouncedSearchTerm);
   }, [debouncedSearchTerm]);
 
   if (isLoading) {

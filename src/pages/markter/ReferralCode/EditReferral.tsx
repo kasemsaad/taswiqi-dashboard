@@ -59,6 +59,15 @@ const EditReferralPage = () => {
     earning_precentage:  string;
     link_code: string;
   };
+  const handleBrandChange = (brandId: string) => {
+    formik.setFieldValue("brand_id", brandId);
+    
+    // البحث عن الشركة المختارة وتعيين القيم الافتراضية
+    const selectedBrand = brands.find(brand => brand.id.toString() === brandId);
+    if (selectedBrand) {
+      formik.setFieldValue("earning_precentage", selectedBrand.default_link_earning || "");
+    }
+  };
 
   const fetchReferralLink = async (id: string) => {
     try {
@@ -145,15 +154,11 @@ const EditReferralPage = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="brand_id" >الشركة *</Label>
+             <div className="space-y-2">
+                <Label htmlFor="brand_id">الشركة *</Label>
                 <Select
-                
                   value={formik.values.brand_id}
-                  onValueChange={(value) => {
-                    formik.setFieldValue("brand_id", value);
-                    formik.setFieldTouched("brand_id", true, false);
-                  }}
+                  onValueChange={handleBrandChange}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="اختر الشركة" />
@@ -172,7 +177,6 @@ const EditReferralPage = () => {
                   </div>
                 )}
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="link">رابط الإحالة *</Label>
                 <Input

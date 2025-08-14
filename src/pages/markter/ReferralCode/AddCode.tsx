@@ -54,22 +54,22 @@ const AddReferralPage = () => {
     onSubmit: async (values) => {
       setIsSubmitting(true);
       try {
-        const formData = new FormData();
-
-        formData.append("brand_id", values.brand_id);
-        formData.append("earning_precentage", values.earning_precentage);
-        formData.append("code", values.code);
-        await CreareCode(values);
+        await CreareCode({
+          brand_id: values.brand_id,
+          earning_precentage: values.earning_precentage,
+          code: values.code,
+         
+        });
         toast({
           title: "تم بنجاح",
-          description: "تم إضافة  كود الخصم بنجاح",
+          description: "تم إضافة كود الخصم بنجاح",
           variant: "success",
         });
         navigate("/LinksCodes");
       } catch (error) {
         toast({
           title: "خطأ",
-          description: "حدث خطأ أثناء إضافة  كود الخصم",
+          description: "حدث خطأ أثناء إضافة كود الخصم",
           variant: "destructive",
         });
       } finally {
@@ -77,6 +77,16 @@ const AddReferralPage = () => {
       }
     },
   });
+
+  // عند اختيار الشركة، تعبئة القيم الافتراضية
+  const handleBrandChange = (brandId: string) => {
+    formik.setFieldValue("brand_id", brandId);
+    
+    const selectedBrand = brands.find(brand => brand.id.toString() === brandId);
+    if (selectedBrand) {
+      formik.setFieldValue("earning_precentage", selectedBrand.default_code_earning || "");
+    }
+  };
 
   useEffect(() => {
     fetchBrands();
@@ -107,10 +117,7 @@ const AddReferralPage = () => {
                 <Label htmlFor="brand_id">الشركة *</Label>
                 <Select
                   value={formik.values.brand_id}
-                  onValueChange={(value) => {
-                    formik.setFieldValue("brand_id", value);
-                    formik.setFieldTouched("brand_id", true, false);
-                  }}
+                  onValueChange={handleBrandChange}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="اختر الشركة" />
@@ -152,7 +159,7 @@ const AddReferralPage = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="code">كود  *</Label>
+                <Label htmlFor="code">كود *</Label>
                 <Input
                   id="code"
                   name="code"
@@ -183,7 +190,7 @@ const AddReferralPage = () => {
           </Button>
           <Button type="submit" className="gap-2" disabled={isSubmitting}>
             <Save className="w-4 h-4" />
-            حفظ  كود الخصم
+            حفظ كود الخصم
           </Button>
         </div>
       </form>

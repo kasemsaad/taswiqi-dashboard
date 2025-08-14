@@ -76,7 +76,7 @@ const navigation = [
   { name: "التحقق من الهوية", href: "/verification", icon: Shield },
   { name: "الإشعارات", href: "/notification", icon: Megaphone },
   { name: "الدول", href: "/countries", icon: Container },
-  { name: "الوصف", href: "/categories", icon: ChartColumnStacked },
+  { name: "التصنيق", href: "/categories", icon: ChartColumnStacked },
   { name: "الدعم", href: "/support", icon: HeadphonesIcon },
   { name: "واتساب", href: "/qr", icon: ScanQrCode },
   { name: "الإعدادات العامة", href: "/settings", icon: Settings },

@@ -20,7 +20,13 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowRight, Save, Ban } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
-import { GetAllCountries, GetAllCategories, EditBrands, GetBrandById, CreateBlockBrand } from "@/services/userService";
+import {
+  GetAllCountries,
+  GetAllCategories,
+  EditBrands,
+  GetBrandById,
+  CreateBlockBrand,
+} from "@/services/userService";
 import {
   Dialog,
   DialogContent,
@@ -61,6 +67,8 @@ const validationSchema = Yup.object().shape({
       return /^\d{1,14}$/.test(value);
     }),
   code: Yup.string().required("الكود مطلوب"),
+  default_link_earning: Yup.number().required(" رقم العمولة مطلوب"),
+  default_code_earning: Yup.number().required(" رقم العمولة مطلوب"),
 });
 
 type Brand = {
@@ -74,7 +82,9 @@ type Brand = {
   phone?: string;
   code?: string;
   status?: string;
-  is_active?:boolean;
+  is_active?: boolean;
+  default_link_earning?: string;
+  default_code_earning?: string;
 };
 
 const EditCompanyPage = () => {
@@ -112,7 +122,7 @@ const EditCompanyPage = () => {
     try {
       const response = await GetBrandById(id);
       setBrandData(response.data as Brand);
-      
+
       if (response.data) {
         const brand = response.data as Brand;
         formik.setValues({
@@ -130,6 +140,8 @@ const EditCompanyPage = () => {
           google_drive_url: brand.google_drive_url || "",
           email: brand.email || "",
           phone: brand.phone || "",
+          default_link_earning: brand.default_link_earning || "",
+          default_code_earning: brand.default_code_earning || "",
           code: brand.code || "",
         });
       }
@@ -142,11 +154,11 @@ const EditCompanyPage = () => {
     try {
       const type = !currentStatus ? "unblock" : "block";
       const formData = new FormData();
-      
+
       formData.append("brand_id", brandId);
       formData.append("type", type);
       formData.append("reason", reason);
-      
+
       // Ensure we only append images if they exist
       if (images && images.length > 0) {
         images.forEach((img, index) => {
@@ -160,7 +172,9 @@ const EditCompanyPage = () => {
 
       toast({
         title: "تم بنجاح",
-        description: currentStatus ? "تم حظر العلامة التجارية" : "تم إلغاء حظر العلامة التجارية",
+        description: currentStatus
+          ? "تم حظر العلامة التجارية"
+          : "تم إلغاء حظر العلامة التجارية",
         variant: "success",
       });
 
@@ -197,6 +211,8 @@ const EditCompanyPage = () => {
       email: "",
       phone: "",
       code: "",
+      default_code_earning: "",
+      default_link_earning: "",
     },
     validationSchema,
     onSubmit: async (values) => {
@@ -210,8 +226,8 @@ const EditCompanyPage = () => {
         formData.append("description[en]", values.description.en);
         if (values.logo) formData.append("logo", values.logo);
         formData.append("category_id", values.category_id);
-        
-        values.countries.forEach(countryId => {
+
+        values.countries.forEach((countryId) => {
           formData.append("countries[][country_id]", countryId.toString());
         });
 
@@ -219,6 +235,8 @@ const EditCompanyPage = () => {
         formData.append("email", values.email);
         formData.append("phone", values.phone);
         formData.append("code", values.code);
+        formData.append("default_code_earning", values.default_code_earning);
+        formData.append("default_link_earning", values.default_link_earning);
         formData.append("_method", "put");
 
         await EditBrands(String(id), formData);
@@ -244,7 +262,7 @@ const EditCompanyPage = () => {
 
   const handleCountryToggle = (countryId: number) => {
     const newCountries = formik.values.countries.includes(countryId)
-      ? formik.values.countries.filter(id => id !== countryId)
+      ? formik.values.countries.filter((id) => id !== countryId)
       : [...formik.values.countries, countryId];
     formik.setFieldValue("countries", newCountries);
   };
@@ -330,9 +348,9 @@ const EditCompanyPage = () => {
                 <Label htmlFor="logo">الشعار</Label>
                 <div className="flex items-center gap-4">
                   {BrandData.logo && !formik.values.logo && (
-                    <img 
-                      src={BrandData.logo} 
-                      alt="Company logo" 
+                    <img
+                      src={BrandData.logo}
+                      alt="Company logo"
                       className="h-12 w-12 object-cover rounded-md"
                     />
                   )}
@@ -342,7 +360,10 @@ const EditCompanyPage = () => {
                     accept="image/*"
                     onChange={(event) => {
                       if (event.currentTarget.files) {
-                        formik.setFieldValue("logo", event.currentTarget.files[0]);
+                        formik.setFieldValue(
+                          "logo",
+                          event.currentTarget.files[0]
+                        );
                       }
                     }}
                     onBlur={formik.handleBlur}
@@ -350,7 +371,9 @@ const EditCompanyPage = () => {
                   />
                 </div>
                 {formik.touched.logo && formik.errors.logo && (
-                  <div className="text-sm text-red-500">{formik.errors.logo}</div>
+                  <div className="text-sm text-red-500">
+                    {formik.errors.logo}
+                  </div>
                 )}
               </div>
             </div>
@@ -525,7 +548,52 @@ const EditCompanyPage = () => {
                 </div>
               </div>
             </div>
-
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="default_link_earning">
+                  {" "}
+                  للروابط العمولة الافتراضية *
+                </Label>
+                <Input
+                  id="default_link_earning"
+                  name="default_link_earning"
+                  type="number"
+                  value={formik.values.default_link_earning || ""}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  placeholder="أدخل  العموله الافتراضيه للروابط"
+                />
+                {formik.touched.default_link_earning &&
+                  formik.errors.default_link_earning && (
+                    <div className="text-sm text-red-500">
+                      {formik.errors.default_link_earning}
+                    </div>
+                  )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="default_link_earning">
+                  {" "}
+                  للاكواد العمولة الافتراضية *
+                </Label>
+                <div className="flex flex-col">
+                  <Input
+                    id="default_code_earning"
+                    name="default_code_earning"
+                    type="number"
+                    value={formik.values.default_code_earning || ""}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    placeholder="أدخل  العموله الافتراضيه للاكواد"
+                  />
+                  {formik.touched.default_code_earning &&
+                    formik.errors.default_code_earning && (
+                      <div className="text-sm text-red-500">
+                        {formik.errors.default_code_earning}
+                      </div>
+                    )}
+                </div>
+              </div>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="google_drive_url">رابط جوجل درايف</Label>
               <Input
@@ -570,7 +638,7 @@ const EditCompanyPage = () => {
                   : `هل أنت متأكد من أنك تريد حظر ${BrandData.name.ar}؟ هذا الإجراء سيمنع الوصول إلى العلامة التجارية.`}
               </DialogDescription>
             </DialogHeader>
-            
+
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="reason" className="text-right">
@@ -580,7 +648,11 @@ const EditCompanyPage = () => {
                   id="reason"
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
-placeholder={BrandData.is_active ? "أدخل سبب الحظر" : "أدخل سبب الغاء الحظر"}
+                  placeholder={
+                    BrandData.is_active
+                      ? "أدخل سبب الحظر"
+                      : "أدخل سبب الغاء الحظر"
+                  }
                   className="min-h-[100px]"
                 />
               </div>
@@ -591,7 +663,7 @@ placeholder={BrandData.is_active ? "أدخل سبب الحظر" : "أدخل سب
                   label=""
                   multiple
                   onFilesSelected={(files) => {
-                    const newImages = files.map(file => ({ image: file }));
+                    const newImages = files.map((file) => ({ image: file }));
                     setImages(newImages);
                   }}
                 />
@@ -609,7 +681,7 @@ placeholder={BrandData.is_active ? "أدخل سبب الحظر" : "أدخل سب
                 )}
               </div>
             </div>
-            
+
             <DialogFooter className="gap-2">
               <Button
                 variant="outline"
@@ -619,10 +691,12 @@ placeholder={BrandData.is_active ? "أدخل سبب الحظر" : "أدخل سب
               </Button>
               <Button
                 variant={!BrandData.is_active ? "success" : "destructive"}
-                onClick={() => handleBlockBrand(id as string, BrandData.is_active ??false)}
+                onClick={() =>
+                  handleBlockBrand(id as string, BrandData.is_active ?? false)
+                }
                 disabled={!reason.trim()}
               >
-                {!BrandData.is_active? "إلغاء الحظر" : "تأكيد الحظر"}
+                {!BrandData.is_active ? "إلغاء الحظر" : "تأكيد الحظر"}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -638,11 +712,7 @@ placeholder={BrandData.is_active ? "أدخل سبب الحظر" : "أدخل سب
           >
             إلغاء
           </Button>
-          <Button
-            type="submit"
-            className="gap-2"
-            disabled={isSubmitting}
-          >
+          <Button type="submit" className="gap-2" disabled={isSubmitting}>
             <Save className="w-4 h-4" />
             حفظ التعديلات
           </Button>

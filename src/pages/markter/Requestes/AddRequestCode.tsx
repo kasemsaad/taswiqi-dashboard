@@ -21,7 +21,12 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { Command, CommandInput, CommandList, CommandGroup } from "@/components/ui/command";
+import {
+  Command,
+  CommandInput,
+  CommandList,
+  CommandGroup,
+} from "@/components/ui/command";
 
 const validationSchema = Yup.object().shape({
   discount_code_id: Yup.string().required("كود خصم مطلوب"),
@@ -37,6 +42,7 @@ const AddCodePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [idbrand, setbrandId] = useState<any>(null);
 
   // Debounce search term
   useEffect(() => {
@@ -53,6 +59,9 @@ const AddCodePage = () => {
     try {
       const response = await GetReferralRequestById(id);
       setRequestData(response.data);
+      const brand_id = (response.data as any).id ;
+      console.log("arrr", brand_id);
+      setbrandId(brand_id);
     } catch (error) {
       console.error("Error fetching request data:", error);
       toast({
@@ -65,9 +74,9 @@ const AddCodePage = () => {
     }
   };
 
-  const fetchCodeList = async (search: string) => {
+  const fetchCodeList = async (id: string, search: string) => {
     try {
-      const response = await GetAllCodesNotRreserved({
+      const response = await GetAllCodesNotRreserved(id, {
         searchTerm: search || undefined,
       });
       const CodeData = Array.isArray(response?.data) ? response.data : [];
@@ -116,11 +125,10 @@ const AddCodePage = () => {
     if (id) {
       fetchRequestData(id);
     }
-    fetchCodeList("");
+    fetchCodeList(idbrand, "");
   }, [id]);
-
   useEffect(() => {
-    fetchCodeList(debouncedSearchTerm);
+    fetchCodeList(idbrand, debouncedSearchTerm);
   }, [debouncedSearchTerm]);
 
   if (isLoading) {
@@ -187,34 +195,37 @@ const AddCodePage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="discount_code_id">كود خصم *</Label>
-             <Select
-  value={formik.values.discount_code_id?.toString() || ""}
-  onValueChange={(value) => {
-    formik.setFieldValue("discount_code_id", value);
-  }}
->
-  <SelectTrigger>
-    <SelectValue placeholder="اختر كود خصم" />
-  </SelectTrigger>
-  <SelectContent>
-    <Command shouldFilter={false}>
-      <CommandInput
-        placeholder="ابحث عن كود..."
-        value={searchTerm}
-        onValueChange={setSearchTerm}
-      />
-      <CommandList>
-        <CommandGroup>
-          {codes.map((code) => (
-            <SelectItem key={code.id} value={code.id.toString()}>
-              {code.code}
-            </SelectItem>
-          ))}
-        </CommandGroup>
-      </CommandList>
-    </Command>
-  </SelectContent>
-</Select>
+                <Select
+                  value={formik.values.discount_code_id?.toString() || ""}
+                  onValueChange={(value) => {
+                    formik.setFieldValue("discount_code_id", value);
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="اختر كود خصم" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <Command shouldFilter={false}>
+                      <CommandInput
+                        placeholder="ابحث عن كود..."
+                        value={searchTerm}
+                        onValueChange={setSearchTerm}
+                      />
+                      <CommandList>
+                        <CommandGroup>
+                          {codes.map((code) => (
+                            <SelectItem
+                              key={code.id}
+                              value={code.id.toString()}
+                            >
+                              {code.code}
+                            </SelectItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </SelectContent>
+                </Select>
 
                 {formik.touched.discount_code_id &&
                   formik.errors.discount_code_id && (

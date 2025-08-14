@@ -27,7 +27,6 @@ const validationSchema = Yup.object().shape({
     .min(1, "يجب أن تكون النسبة بين 1 و 100")
     .max(100, "يجب أن تكون النسبة بين 1 و 100")
     .required("نسبة الربح مطلوبة"),
-  link_code: Yup.string().required("كود الرابط مطلوب"),
 });
 
 const AddReferralPage = () => {
@@ -47,24 +46,35 @@ const AddReferralPage = () => {
     }
   };
 
+  // دالة لمعالجة تغيير الشركة
+  const handleBrandChange = (brandId: string) => {
+    formik.setFieldValue("brand_id", brandId);
+    
+    // البحث عن الشركة المختارة وتعيين القيم الافتراضية
+    const selectedBrand = brands.find(brand => brand.id.toString() === brandId);
+    if (selectedBrand) {
+      formik.setFieldValue("earning_precentage", selectedBrand.default_link_earning || "");
+    }
+  };
+
   const formik = useFormik({
     initialValues: {
       brand_id: "",
       link: "",
       earning_precentage: "",
       link_code: "",
+   
     },
     validationSchema,
     onSubmit: async (values) => {
       setIsSubmitting(true);
       try {
-        const formData = new FormData();
-
-        formData.append("brand_id", values.brand_id);
-        formData.append("link", values.link);
-        formData.append("earning_precentage", values.earning_precentage);
-        formData.append("link_code", values.link_code);
-        await CreareReferralLink(values);
+        await CreareReferralLink({
+          brand_id: values.brand_id,
+          link: values.link,
+          earning_precentage: values.earning_precentage,
+          link_code: values.link_code,
+        });
         toast({
           title: "تم بنجاح",
           description: "تم إضافة رابط الإحالة بنجاح",
@@ -113,10 +123,7 @@ const AddReferralPage = () => {
                 <Label htmlFor="brand_id">الشركة *</Label>
                 <Select
                   value={formik.values.brand_id}
-                  onValueChange={(value) => {
-                    formik.setFieldValue("brand_id", value);
-                    formik.setFieldTouched("brand_id", true, false);
-                  }}
+                  onValueChange={handleBrandChange}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="اختر الشركة" />
@@ -193,6 +200,8 @@ const AddReferralPage = () => {
                 )}
               </div>
             </div>
+
+            
           </CardContent>
         </Card>
 
