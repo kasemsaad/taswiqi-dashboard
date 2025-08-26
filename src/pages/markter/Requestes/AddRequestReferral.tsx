@@ -54,7 +54,7 @@ const AddReferralPage = () => {
     try {
       const response = await GetReferralRequestById(id);
       setRequestData(response.data);
-      const brand_id = (response.data as any).id
+      const brand_id = (response.data as any).brand_id
       setbrandId(brand_id)
     } catch (error) {
       console.error("Error fetching request data:", error);
@@ -119,12 +119,11 @@ const AddReferralPage = () => {
     if (id) {
       fetchRequestData(id);
     }
-    fetchCodeList(idbrand,"");
   }, [id]);
   
   useEffect(() => {
     fetchCodeList(idbrand, debouncedSearchTerm);
-  }, [debouncedSearchTerm]);
+  }, [idbrand,debouncedSearchTerm]);
 
   if (isLoading) {
     return <div className="container mx-auto p-6">جاري التحميل...</div>;

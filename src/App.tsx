@@ -38,6 +38,7 @@ import CommunityPage from "./pages/Don`tUse/CommunityPage";
 import AchievementsPage from "./pages/Don`tUse/AchievementsPage";
 import Qr from "./pages/markter/Qr/Qr";
 import QrAdd from "./pages/markter/Qr/QrAdd";
+import TermsِAndpolicy from "./pages/markter/Terms&policy/Terms&policy";
 import SupportPage from "./pages/markter/Support/SupportPage";
 import VerificationPage from "./pages/markter/Approval/VerificationPage";
 import EditVerificationPage from "./pages/markter/Approval/VerfcationRequest";
@@ -131,6 +132,7 @@ const App = () => (
             <Route path="support" element={<SupportPage />} />
             <Route path="qr" element={<Qr />} />
             <Route path="qr/add" element={<QrAdd />} />
+            <Route path="privacy-policy" element={<TermsِAndpolicy />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
           <Route path="*" element={<NotFound />} />

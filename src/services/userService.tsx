@@ -1,5 +1,6 @@
 import Api from "./baseUrlCustomer";
 import type { UsersServices } from "../components/interfaces/Interfaces";
+
 export const GetCustomersById = async (id: string): Promise<UsersServices> => {
   const response = await Api.get<UsersServices>(`customers/${id}`);
   return response.data;
@@ -636,6 +637,42 @@ export const DeleteNotificationyId = async (
   );
   return response.data;
 };
+export const GetAllpagesTerms = async (
+  params?: GetParams
+): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>("pages", {
+    params,
+  });
+  return response.data;
+};
+export const GetpageById = async (id: string): Promise<UsersServices> => {
+  const response = await Api.get<UsersServices>(`pages/${id}`);
+  return response.data;
+};
+
+export const DeletepageId = async (
+  id: string
+): Promise<UsersServices> => {
+  const response = await Api.delete<UsersServices>(
+    `pages/${id}`
+  );
+  return response.data;
+};
+export const Createpage = async (sendData: object): Promise<UsersServices> => {
+  const response = await Api.post<UsersServices>(
+    `pages`,
+    sendData
+  );
+  return response.data;
+};
+export const UpdatePage = async (id: number, sendData: object): Promise<UsersServices> => {
+  const response = await Api.post<UsersServices>(
+    `pages/${id}`,
+    sendData
+  );
+  return response.data;
+};
+
 export const DeleteNotificationsReadit = async (): Promise<UsersServices> => {
   const response = await Api.delete<UsersServices>(
     `notifications/delete-readed`

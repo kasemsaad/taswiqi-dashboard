@@ -14,6 +14,7 @@ import {
   Settings,
   Menu,
   ScanQrCode,
+  ClipboardList,
   Bell,
   User,
   Moon,
@@ -79,6 +80,7 @@ const navigation = [
   { name: "التصنيق", href: "/categories", icon: ChartColumnStacked },
   { name: "الدعم", href: "/support", icon: HeadphonesIcon },
   { name: "واتساب", href: "/qr", icon: ScanQrCode },
+  { name: "السياسة والخصوصية", href: "/privacy-policy", icon: ClipboardList  },
   { name: "الإعدادات العامة", href: "/settings", icon: Settings },
 ];
 
