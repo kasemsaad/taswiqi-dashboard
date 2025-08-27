@@ -36,11 +36,10 @@ const Qr = () => {
         sort_order: "desc",
         // search: searchTerm,
       });
-
       // Fix: Type guard for response and its nested properties
       let qrData: QrSession[] = [];
       let total = 0;
-
+      
       if (
         response &&
         typeof response === "object" &&
@@ -48,9 +47,10 @@ const Qr = () => {
         response.data &&
         typeof response.data === "object"
       ) {
-        const dataObj = response.data as { data?: unknown; meta?: { total?: number } };
+        const dataObj = response as { data?: unknown; meta?: { total?: number } };
         if (Array.isArray(dataObj.data)) {
           qrData = dataObj.data as QrSession[];
+          console.log(qrData);
         }
         if (dataObj.meta && typeof dataObj.meta.total === "number") {
           total = dataObj.meta.total;
@@ -95,7 +95,7 @@ const Qr = () => {
 
   useEffect(() => {
     fetchQrData();
-  }, [page, perPage,]);
+  }, []);
 
   const columns: TableColumn[] = [
     {
